@@ -45,6 +45,10 @@ function goToArchive() {
 function goToUpload() {
   router.push({ name: 'upload-photo' })
 }
+
+function goToBrowse() {
+  router.push({ name: 'browse' })
+}
 </script>
 
 <template>
@@ -100,7 +104,6 @@ function goToUpload() {
           <div class="timeline__header">
             <div>
               <h2 class="timeline__title">Podróż przez czas</h2>
-              <p class="timeline__subtitle">Wybierz dekadę, by zobaczyć jak zmieniało się nasze życie.</p>
             </div>
             <button class="timeline__see-all" @click="goToBrowse">Zobacz całą oś czasu</button>
           </div>
@@ -139,11 +142,12 @@ function goToUpload() {
           <div class="bento" v-if="bentoCategories.length">
             <!-- Main card -->
             <RouterLink
-              v-if="bentoCategories[0] && coverImages[bentoCategories[0].id]"
+              v-if="bentoCategories[0]"
               :to="{ name: 'browse-category', params: { categoryId: bentoCategories[0].id } }"
               class="bento__card bento__card--main"
+              :class="{ 'bento__card--no-img': !coverImages[bentoCategories[0].id] }"
             >
-              <img :src="coverImages[bentoCategories[0].id]" :alt="bentoCategories[0].name" class="bento__img" />
+              <img v-if="coverImages[bentoCategories[0].id]" :src="coverImages[bentoCategories[0].id]" :alt="bentoCategories[0].name" class="bento__img" />
               <div class="bento__gradient bento__gradient--primary"></div>
               <div class="bento__content bento__content--large">
                 <span class="bento__badge">Najpopularniejsze</span>
@@ -153,11 +157,12 @@ function goToUpload() {
 
             <!-- Small card top-right -->
             <RouterLink
-              v-if="bentoCategories[1] && coverImages[bentoCategories[1].id]"
+              v-if="bentoCategories[1]"
               :to="{ name: 'browse-category', params: { categoryId: bentoCategories[1].id } }"
               class="bento__card bento__card--sm-top"
+              :class="{ 'bento__card--no-img': !coverImages[bentoCategories[1].id] }"
             >
-              <img :src="coverImages[bentoCategories[1].id]" :alt="bentoCategories[1].name" class="bento__img" />
+              <img v-if="coverImages[bentoCategories[1].id]" :src="coverImages[bentoCategories[1].id]" :alt="bentoCategories[1].name" class="bento__img" />
               <div class="bento__gradient bento__gradient--dark"></div>
               <div class="bento__content">
                 <h3 class="bento__card-title">{{ bentoCategories[1].name }}</h3>
@@ -166,11 +171,12 @@ function goToUpload() {
 
             <!-- Small card mid-right -->
             <RouterLink
-              v-if="bentoCategories[2] && coverImages[bentoCategories[2].id]"
+              v-if="bentoCategories[2]"
               :to="{ name: 'browse-category', params: { categoryId: bentoCategories[2].id } }"
               class="bento__card bento__card--sm-mid"
+              :class="{ 'bento__card--no-img': !coverImages[bentoCategories[2].id] }"
             >
-              <img :src="coverImages[bentoCategories[2].id]" :alt="bentoCategories[2].name" class="bento__img" />
+              <img v-if="coverImages[bentoCategories[2].id]" :src="coverImages[bentoCategories[2].id]" :alt="bentoCategories[2].name" class="bento__img" />
               <div class="bento__gradient bento__gradient--dark"></div>
               <div class="bento__content">
                 <h3 class="bento__card-title">{{ bentoCategories[2].name }}</h3>
@@ -179,16 +185,24 @@ function goToUpload() {
 
             <!-- Wide card bottom -->
             <RouterLink
-              v-if="bentoCategories[3] && coverImages[bentoCategories[3].id]"
+              v-if="bentoCategories[3]"
               :to="{ name: 'browse-category', params: { categoryId: bentoCategories[3].id } }"
               class="bento__card bento__card--wide"
+              :class="{ 'bento__card--no-img': !coverImages[bentoCategories[3].id] }"
             >
-              <img :src="coverImages[bentoCategories[3].id]" :alt="bentoCategories[3].name" class="bento__img" />
+              <img v-if="coverImages[bentoCategories[3].id]" :src="coverImages[bentoCategories[3].id]" :alt="bentoCategories[3].name" class="bento__img" />
               <div class="bento__gradient bento__gradient--primary"></div>
               <div class="bento__content bento__content--wide">
                 <h3 class="bento__card-title bento__card-title--med">{{ bentoCategories[3].name }}</h3>
               </div>
             </RouterLink>
+          </div>
+
+          <!-- Empty state when no categories exist yet -->
+          <div v-else-if="!categoriesStore.isLoading" class="collections__empty">
+            <span class="material-symbols-outlined">photo_library</span>
+            <p>Kolekcje pojawią się tutaj po dodaniu kategorii i zdjęć.</p>
+            <RouterLink to="/admin/kategorie" class="btn btn-outline">Zarządzaj kategoriami</RouterLink>
           </div>
         </div>
       </section>
@@ -245,7 +259,7 @@ function goToUpload() {
         </div>
 
         <div class="lfooter__copyright">
-          <p>© 2024 Cyfrowe Archiwum. Wszystkie prawa zastrzeżone. Projekt realizowany w trosce o wspólną pamięć.</p>
+          <p>© 2026 Cyfrowe Archiwum. Wszystkie prawa zastrzeżone. Projekt realizowany w trosce o wspólną pamięć.</p>
         </div>
       </div>
     </footer>
@@ -688,6 +702,27 @@ function goToUpload() {
   height: 100%;
   object-fit: cover;
   transition: transform 700ms ease;
+}
+
+.bento__card--no-img {
+  background: linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 60%, black) 100%);
+}
+
+.collections__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--on-surface-variant);
+  border: 2px dashed var(--ghost-border);
+  border-radius: var(--radius-lg);
+}
+
+.collections__empty .material-symbols-outlined {
+  font-size: 48px;
+  opacity: 0.4;
 }
 
 .bento__card:hover .bento__img {
