@@ -48,6 +48,7 @@ export interface PhotoSearchParams {
   radius?: number
   dateFrom?: string
   dateTo?: string
+  tag?: string
   sortBy?: 'date' | 'createdAt' | 'relevance'
   sortDir?: 'asc' | 'desc'
   page?: number
@@ -73,4 +74,11 @@ export interface PhotoUpdatePayload {
   lng?: number
   locationLabel?: string
   date?: string
+  technique?: string
+  quote?: string
+  inventoryNumber?: string
+  originalFormat?: string
+  license?: string
+  digitization?: string
+  tags?: string
 }

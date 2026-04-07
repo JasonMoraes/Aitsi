@@ -6,6 +6,7 @@ const props = defineProps<{
   categoryId?: number
   dateFrom?: string
   dateTo?: string
+  tag?: string
   sortBy?: string
   sortDir?: string
   categories: CategoryNode[]
@@ -15,6 +16,7 @@ const emit = defineEmits<{
   'update:categoryId': [value: number | undefined]
   'update:dateFrom': [value: string]
   'update:dateTo': [value: string]
+  'update:tag': [value: string]
   'update:sortBy': [value: string]
   'update:sortDir': [value: string]
   reset: []
@@ -32,6 +34,10 @@ function onDateFromInput(event: Event) {
 
 function onDateToInput(event: Event) {
   emit('update:dateTo', (event.target as HTMLInputElement).value)
+}
+
+function onTagInput(event: Event) {
+  emit('update:tag', (event.target as HTMLInputElement).value)
 }
 
 function onSortByChange(event: Event) {
@@ -103,6 +109,22 @@ function onSortDirChange(event: Event) {
             />
           </label>
         </div>
+      </div>
+    </details>
+
+    <details class="filters__section" open>
+      <summary class="filters__summary">Tag</summary>
+      <div class="filters__content">
+        <label class="filters__label">
+          <span class="filters__label-text">Nazwa tagu</span>
+          <input
+            type="text"
+            class="filters__input"
+            :value="tag"
+            placeholder="np. Architektura"
+            @input="onTagInput"
+          />
+        </label>
       </div>
     </details>
 

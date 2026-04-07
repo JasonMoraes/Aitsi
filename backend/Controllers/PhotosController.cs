@@ -7,6 +7,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers;
 
+public class PhotoUpdateDto
+{
+    public string? Title { get; set; }
+    public string? Description { get; set; }
+    public int? CategoryId { get; set; }
+    public string? Date { get; set; }
+    public double? Lat { get; set; }
+    public double? Lng { get; set; }
+    public string? LocationLabel { get; set; }
+    public string? Technique { get; set; }
+    public string? Quote { get; set; }
+    public string? InventoryNumber { get; set; }
+    public string? OriginalFormat { get; set; }
+    public string? License { get; set; }
+    public string? Digitization { get; set; }
+    public string? Tags { get; set; }
+}
+
 public class PhotoUploadDto
 {
     public IFormFile File { get; set; } = null!;
@@ -54,12 +72,13 @@ public class PhotosController : ControllerBase
         return Ok(photo);
     }
 
-    [HttpGet]                                                                                                                                        
-    public async Task<IActionResult> GetPhotos(                                                                                                      
-        [FromQuery] string? q,                                                                                                                       
-        [FromQuery] int? categoryId,                                                                                                                 
-        [FromQuery] string? dateFrom,                                                                                                              
+    [HttpGet]
+    public async Task<IActionResult> GetPhotos(
+        [FromQuery] string? q,
+        [FromQuery] int? categoryId,
+        [FromQuery] string? dateFrom,
         [FromQuery] string? dateTo,
+        [FromQuery] string? tag,
         [FromQuery] string? sortBy,
         [FromQuery] string? sortDir,
         [FromQuery] int page = 1,
@@ -82,6 +101,11 @@ public class PhotosController : ControllerBase
       if (categoryId.HasValue)
       {
           query = query.Where(p => p.CategoryId == categoryId.Value);
+      }
+
+      if (!string.IsNullOrEmpty(tag))
+      {
+          query = query.Where(p => p.Tags.Any(t => t.Name == tag));
       }
 
       if (!string.IsNullOrEmpty(dateFrom))
@@ -231,17 +255,44 @@ public class PhotosController : ControllerBase
 
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> EditPhoto(int id, [FromBody] Photo photo)
+    public async Task<IActionResult> EditPhoto(int id, [FromBody] PhotoUpdateDto dto)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var isAdmin = User.IsInRole("admin");
 
-        var existing = await _db.Photos.FindAsync(id);
+        var existing = await _db.Photos.Include(p => p.Tags).FirstOrDefaultAsync(p => p.Id == id);
         if (existing == null) return NotFound();
         if (existing.AuthorId != userId && !isAdmin) return Forbid();
 
-        _db.Entry(existing).CurrentValues.SetValues(photo);
+        if (dto.Title != null) existing.Title = dto.Title;
+        existing.Description = dto.Description;
+        if (dto.CategoryId.HasValue) existing.CategoryId = dto.CategoryId.Value;
+        if (dto.Date != null) existing.Date = dto.Date;
+        existing.Lat = dto.Lat;
+        existing.Lng = dto.Lng;
+        existing.LocationLabel = dto.LocationLabel;
+        existing.Technique = dto.Technique;
+        existing.Quote = dto.Quote;
+        existing.InventoryNumber = dto.InventoryNumber;
+        existing.OriginalFormat = dto.OriginalFormat;
+        existing.License = dto.License;
+        existing.Digitization = dto.Digitization;
+
+        if (dto.Tags != null)
+        {
+            existing.Tags.Clear();
+            var tagNames = dto.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var name in tagNames)
+            {
+                var t = await _db.Tags.FirstOrDefaultAsync(x => x.Name == name) ?? new Tag { Name = name };
+                if (t.Id == 0) _db.Tags.Add(t);
+                existing.Tags.Add(t);
+            }
+        }
+
         await _db.SaveChangesAsync();
+        await _db.Entry(existing).Reference(p => p.Category).LoadAsync();
+        await _db.Entry(existing).Reference(p => p.Author).LoadAsync();
         return Ok(existing);
     }
 

@@ -17,6 +17,7 @@ export function usePhotoSearch() {
       ...(q.radius && { radius: Number(q.radius) }),
       ...(q.dateFrom && { dateFrom: String(q.dateFrom) }),
       ...(q.dateTo && { dateTo: String(q.dateTo) }),
+      ...(q.tag && { tag: String(q.tag) }),
       ...(q.sortBy && { sortBy: String(q.sortBy) as PhotoSearchParams['sortBy'] }),
       ...(q.sortDir && { sortDir: String(q.sortDir) as PhotoSearchParams['sortDir'] }),
       ...(q.page && { page: Number(q.page) }),
@@ -32,6 +33,7 @@ export function usePhotoSearch() {
     if (params.radius) query.radius = String(params.radius)
     if (params.dateFrom) query.dateFrom = params.dateFrom
     if (params.dateTo) query.dateTo = params.dateTo
+    if (params.tag) query.tag = params.tag
     if (params.sortBy && params.sortBy !== 'relevance') query.sortBy = params.sortBy
     if (params.sortDir && params.sortDir !== 'desc') query.sortDir = params.sortDir
     if (params.page && params.page > 1) query.page = String(params.page)

@@ -10,6 +10,7 @@ const { announcement, politeness } = useAnnouncer()
 </script>
 
 <template>
+  <a href="#main-content" class="skip-link">Przejdź do treści</a>
   <AppHeader />
   <main id="main-content" tabindex="-1">
     <router-view v-slot="{ Component }">
@@ -28,6 +29,25 @@ const { announcement, politeness } = useAnnouncer()
 </template>
 
 <style>
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 8px;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-label);
+  font-weight: 600;
+  text-decoration: none;
+  z-index: 9999;
+  transition: top 0.1s;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
 main {
   outline: none;
   min-height: calc(100vh - 56px - 96px);
