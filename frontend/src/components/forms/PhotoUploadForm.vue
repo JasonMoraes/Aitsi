@@ -60,11 +60,11 @@ function resetForm() {
 
 async function handleSubmit() {
   if (!form.file) {
-    fileError.value = 'Zdjecie jest wymagane'
+    fileError.value = 'Zdjęcie jest wymagane'
     return
   }
   if (!form.title.trim()) {
-    toastStore.show('Tytul jest wymagany', 'error')
+    toastStore.show('Tytuł jest wymagany', 'error')
     return
   }
   fileError.value = ''
@@ -89,11 +89,11 @@ async function handleSubmit() {
     if (form.tags) formData.append('tags', form.tags)
 
     await photosStore.uploadPhoto(formData)
-    toastStore.show('Zdjecie zostalo dodane!', 'success')
+    toastStore.show('Zdjęcie zostało dodane!', 'success')
     resetForm()
     emit('success')
   } catch {
-    toastStore.show('Wystapil blad podczas dodawania zdjecia', 'error')
+    toastStore.show('Wystąpił błąd podczas dodawania zdjęcia', 'error')
   } finally {
     submitting.value = false
   }
@@ -128,13 +128,13 @@ onMounted(() => {
         id="pu-location"
         v-model="form.locationLabel"
         type="text"
-        placeholder="np. Krakow, Rynek Glowny"
+        placeholder="np. Kraków, Rynek Główny"
       />
     </div>
 
     <div class="location-coords">
       <div class="form-field">
-        <label for="pu-lat">Szerokosc geogr.</label>
+        <label for="pu-lat">Szerokość geogr.</label>
         <input
           id="pu-lat"
           v-model.number="form.lat"
@@ -146,7 +146,7 @@ onMounted(() => {
         />
       </div>
       <div class="form-field">
-        <label for="pu-lng">Dlugosc geogr.</label>
+        <label for="pu-lng">Długość geogr.</label>
         <input
           id="pu-lng"
           v-model.number="form.lng"
@@ -182,7 +182,7 @@ onMounted(() => {
         v-model="form.quote"
         rows="2"
         maxlength="1000"
-        placeholder="Anegdota, wspomnienie lub cytat zwiazany ze zdjeciem..."
+        placeholder="Anegdota, wspomnienie lub cytat związany ze zdjęciem..."
       ></textarea>
     </div>
 
@@ -205,7 +205,7 @@ onMounted(() => {
           <input id="pu-technique" v-model="form.technique" type="text" placeholder="np. Sepia, Srebro" />
         </div>
         <div class="form-field">
-          <label for="pu-format">Format oryginalu</label>
+          <label for="pu-format">Format oryginału</label>
           <input id="pu-format" v-model="form.originalFormat" type="text" placeholder="np. 13 x 18 cm" />
         </div>
         <div class="form-field">

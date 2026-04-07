@@ -7,7 +7,7 @@ const authStore = useAuthStore()
 </script>
 
 <template>
-  <nav role="navigation" aria-label="Menu glowne">
+  <nav role="navigation" aria-label="Menu główne">
     <ul class="nav-list">
       <li>
         <router-link to="/przegladaj" class="nav-link">

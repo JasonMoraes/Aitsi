@@ -25,7 +25,7 @@ async function handleDelete() {
   if (deleteTarget.value === null) return
 
   await photosStore.deletePhoto(deleteTarget.value)
-  toastStore.show('Zdjecie zostalo usuniete', 'success')
+  toastStore.show('Zdjęcie zostało usunięte', 'success')
   deleteTarget.value = null
 }
 
@@ -61,10 +61,10 @@ onMounted(() => {
         <div
           class="confirm-dialog"
           role="alertdialog"
-          aria-label="Potwierdz usuniecie"
+          aria-label="Potwierdź usunięcie"
         >
-          <h2>Usunac zdjecie?</h2>
-          <p>Tej operacji nie mozna cofnac.</p>
+          <h2>Usunąć zdjęcie?</h2>
+          <p>Tej operacji nie można cofnąć.</p>
           <div class="confirm-actions">
             <button class="btn-cancel" @click="deleteTarget = null">
               {{ t('common.cancel') }}

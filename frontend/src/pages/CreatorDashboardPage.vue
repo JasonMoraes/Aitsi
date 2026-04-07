@@ -55,9 +55,9 @@ async function deleteMaterial(id: number) {
     await photosStore.deletePhoto(id)
     materials.value = materials.value.filter(m => m.id !== id)
     stats.all--
-    toastStore.show('Material zostal usuniety', 'success')
+    toastStore.show('Materiał został usunięty', 'success')
   } catch {
-    toastStore.show('Nie udalo sie usunac materialu', 'error')
+    toastStore.show('Nie udało się usunąć materiału', 'error')
   }
 }
 
@@ -157,7 +157,7 @@ onMounted(() => {
                   class="creator__card-action creator__card-action--primary"
                 >
                   <span class="material-symbols-outlined">visibility</span>
-                  Podglad
+                  Podgląd
                 </RouterLink>
                 <button class="creator__card-action creator__card-action--error" @click="deleteMaterial(card.id)">
                   <span class="material-symbols-outlined">delete</span>

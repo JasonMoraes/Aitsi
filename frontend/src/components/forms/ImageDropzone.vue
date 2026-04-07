@@ -88,11 +88,11 @@ function removeFile() {
   >
     <!-- Preview state -->
     <div v-if="hasPreview" class="dropzone__preview">
-      <img :src="previewSrc!" :alt="modelValue?.name ?? 'Podglad zdjecia'" />
+      <img :src="previewSrc!" :alt="modelValue?.name ?? 'Podgląd zdjęcia'" />
       <button
         type="button"
         class="dropzone__remove"
-        aria-label="Usun zdjecie"
+        aria-label="Usuń zdjęcie"
         @click="removeFile"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

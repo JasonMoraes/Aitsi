@@ -30,7 +30,7 @@ function formatDate(date: string): string {
 
     <!-- Empty state -->
     <div v-else-if="photos.length === 0" class="empty-state">
-      <p>Brak zdjec</p>
+      <p>Brak zdjęć</p>
     </div>
 
     <!-- Table -->
@@ -38,7 +38,7 @@ function formatDate(date: string): string {
       <thead>
         <tr>
           <th>Miniatura</th>
-          <th>Tytul</th>
+          <th>Tytuł</th>
           <th>Autor</th>
           <th>Data</th>
           <th>Kategoria</th>
@@ -57,7 +57,7 @@ function formatDate(date: string): string {
               loading="lazy"
             />
           </td>
-          <td data-label="Tytul">{{ photo.title }}</td>
+          <td data-label="Tytuł">{{ photo.title }}</td>
           <td data-label="Autor">{{ photo.author.displayName }}</td>
           <td data-label="Data">{{ formatDate(photo.date) }}</td>
           <td data-label="Kategoria">{{ photo.category.name }}</td>

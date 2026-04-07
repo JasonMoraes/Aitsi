@@ -57,7 +57,7 @@ onMounted(() => {
   <form
     class="search-bar"
     role="search"
-    aria-label="Wyszukiwanie zdjec"
+    aria-label="Wyszukiwanie zdjęć"
     @submit.prevent="onSubmit"
   >
     <div class="search-bar__wrapper">

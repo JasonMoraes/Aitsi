@@ -47,17 +47,17 @@ function handleConfirm() {
         aria-modal="true"
         :aria-label="'Zablokuj ' + userName"
       >
-        <h2>Zablokuj uzytkownika {{ userName }}</h2>
-        <p>Zablokowany uzytkownik nie bedzie mogl dodawac nowych materialow.</p>
+        <h2>Zablokuj użytkownika {{ userName }}</h2>
+        <p>Zablokowany użytkownik nie będzie mógł dodawać nowych materiałów.</p>
 
         <div class="form-field">
-          <label for="block-reason">Powod blokady *</label>
+          <label for="block-reason">Powód blokady *</label>
           <textarea
             id="block-reason"
             v-model="reason"
             rows="3"
             required
-            placeholder="Opisz powod blokady..."
+            placeholder="Opisz powód blokady..."
           ></textarea>
         </div>
 

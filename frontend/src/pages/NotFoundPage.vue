@@ -11,7 +11,7 @@ const { t } = useI18n()
       <h1 class="not-found__title">{{ t('common.notFound') }}</h1>
       <p class="not-found__message">{{ t('common.notFoundMessage') }}</p>
       <RouterLink to="/przegladaj" class="btn btn-primary">
-        Wroc na strone glowna
+        Wróć na stronę główną
       </RouterLink>
     </div>
   </div>

@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="location-display" aria-label="Mapa lokalizacji zdjecia">
+  <div class="location-display" aria-label="Mapa lokalizacji zdjęcia">
     <div class="location-display__map" :style="{ height: props.height }">
       <l-map
         :zoom="14"

@@ -139,8 +139,8 @@ function onSortDirChange(event: Event) {
               :value="sortBy || 'relevance'"
               @change="onSortByChange"
             >
-              <option value="relevance">Trafnosc</option>
-              <option value="date">Data zdjecia</option>
+              <option value="relevance">Trafność</option>
+              <option value="date">Data zdjęcia</option>
               <option value="createdAt">Data dodania</option>
             </select>
           </label>
@@ -151,8 +151,8 @@ function onSortDirChange(event: Event) {
               :value="sortDir || 'desc'"
               @change="onSortDirChange"
             >
-              <option value="desc">Malejaco</option>
-              <option value="asc">Rosnaco</option>
+              <option value="desc">Malejąco</option>
+              <option value="asc">Rosnąco</option>
             </select>
           </label>
         </div>

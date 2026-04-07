@@ -43,7 +43,7 @@ async function handleBlock(reason: string) {
     await adminApi.blockUser(blockTarget.value.id, { reason })
     const user = users.value.find((u) => u.id === blockTarget.value!.id)
     if (user) user.isBlocked = true
-    toastStore.show('Uzytkownik zablokowany', 'success')
+    toastStore.show('Użytkownik zablokowany', 'success')
   } catch {
     toastStore.show(t('common.error'), 'error')
   }
@@ -56,7 +56,7 @@ async function handleUnblock(userId: number) {
     await adminApi.unblockUser(userId)
     const user = users.value.find((u) => u.id === userId)
     if (user) user.isBlocked = false
-    toastStore.show('Uzytkownik odblokowany', 'success')
+    toastStore.show('Użytkownik odblokowany', 'success')
   } catch {
     toastStore.show(t('common.error'), 'error')
   }

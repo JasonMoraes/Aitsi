@@ -89,7 +89,7 @@ async function handleSubmit() {
       digitization: form.digitization || undefined,
       tags: form.tags || undefined,
     })
-    toastStore.show('Zdjecie zostalo zaktualizowane!', 'success')
+    toastStore.show('Zdjęcie zostało zaktualizowane!', 'success')
     router.push({ name: 'my-photos' })
   } catch (e) {
     toastStore.show(t('common.error'), 'error')
@@ -101,7 +101,7 @@ async function handleSubmit() {
 
 <template>
   <div class="container">
-    <h1 class="page-title">Edytuj zdjecie</h1>
+    <h1 class="page-title">Edytuj zdjęcie</h1>
 
     <div v-if="loading" class="loading-state">
       <p>{{ t('common.loading') }}</p>
@@ -148,7 +148,7 @@ async function handleSubmit() {
         <label>{{ t('upload.location') }} *</label>
         <div class="location-inputs">
           <div>
-            <label for="lat">Szerokosc geogr.</label>
+            <label for="lat">Szerokość geogr.</label>
             <input
               id="lat"
               v-model.number="form.lat"
@@ -160,7 +160,7 @@ async function handleSubmit() {
             />
           </div>
           <div>
-            <label for="lng">Dlugosc geogr.</label>
+            <label for="lng">Długość geogr.</label>
             <input
               id="lng"
               v-model.number="form.lng"
@@ -178,7 +178,7 @@ async function handleSubmit() {
             id="locationLabel"
             v-model="form.locationLabel"
             type="text"
-            placeholder="np. Krakow, Rynek Glowny"
+            placeholder="np. Kraków, Rynek Główny"
           />
         </div>
       </div>
@@ -190,7 +190,7 @@ async function handleSubmit() {
           v-model="form.quote"
           rows="2"
           maxlength="1000"
-          placeholder="Anegdota, wspomnienie lub cytat zwiazany ze zdjeciem..."
+          placeholder="Anegdota, wspomnienie lub cytat związany ze zdjęciem..."
         ></textarea>
       </div>
 
@@ -213,7 +213,7 @@ async function handleSubmit() {
             <input id="ep-technique" v-model="form.technique" type="text" placeholder="np. Sepia, Srebro" />
           </div>
           <div class="form-field">
-            <label for="ep-format">Format oryginalu</label>
+            <label for="ep-format">Format oryginału</label>
             <input id="ep-format" v-model="form.originalFormat" type="text" placeholder="np. 13 x 18 cm" />
           </div>
           <div class="form-field">

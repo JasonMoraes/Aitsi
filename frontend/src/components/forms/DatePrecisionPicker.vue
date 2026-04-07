@@ -22,8 +22,8 @@ const day = ref<number>(1)
 const currentYear = new Date().getFullYear()
 
 const months = [
-  'Styczen', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec',
-  'Lipiec', 'Sierpien', 'Wrzesien', 'Pazdziernik', 'Listopad', 'Grudzien',
+  'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+  'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień',
 ]
 
 // Parse initial modelValue
@@ -98,7 +98,7 @@ watch([precision, year, month, day], () => {
       </div>
 
       <div v-if="precision === 'month' || precision === 'day'" class="date-field">
-        <label for="date-month">Miesiac</label>
+        <label for="date-month">Miesiąc</label>
         <select id="date-month" v-model.number="month">
           <option
             v-for="(name, idx) in months"
@@ -111,7 +111,7 @@ watch([precision, year, month, day], () => {
       </div>
 
       <div v-if="precision === 'day'" class="date-field">
-        <label for="date-day">Dzien</label>
+        <label for="date-day">Dzień</label>
         <input
           id="date-day"
           v-model.number="day"

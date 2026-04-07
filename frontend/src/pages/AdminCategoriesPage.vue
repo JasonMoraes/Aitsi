@@ -109,7 +109,7 @@ function closeForm() {
     <div class="page-header">
       <h1>{{ t('admin.categories') }}</h1>
       <button class="add-btn" @click="showCreateForm = true">
-        Dodaj kategorie
+        Dodaj kategorię
       </button>
     </div>
 
@@ -168,13 +168,13 @@ function closeForm() {
         <div
           class="confirm-dialog"
           role="alertdialog"
-          aria-label="Potwierdz usuniecie kategorii"
+          aria-label="Potwierdź usunięcie kategorii"
         >
-          <h2>Usunac kategorie "{{ deleteTarget.name }}"?</h2>
+          <h2>Usunąć kategorię "{{ deleteTarget.name }}"?</h2>
           <p v-if="deleteTarget.children.length > 0">
-            Ta kategoria zawiera podkategorie. Usuniecie jej spowoduje usuniecie wszystkich podkategorii.
+            Ta kategoria zawiera podkategorie. Usunięcie jej spowoduje usunięcie wszystkich podkategorii.
           </p>
-          <p v-else>Tej operacji nie mozna cofnac.</p>
+          <p v-else>Tej operacji nie można cofnąć.</p>
           <div class="confirm-actions">
             <button class="btn-cancel" @click="deleteTarget = null">
               {{ t('common.cancel') }}

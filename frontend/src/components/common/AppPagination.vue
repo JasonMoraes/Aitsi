@@ -34,7 +34,7 @@ function goToPage(p: number) {
 </script>
 
 <template>
-  <nav v-if="totalPages > 1" class="pagination" aria-label="Nawigacja miedzy stronami">
+  <nav v-if="totalPages > 1" class="pagination" aria-label="Nawigacja między stronami">
     <p class="pagination__info" aria-live="polite">{{ infoText }}</p>
 
     <div class="pagination__controls">

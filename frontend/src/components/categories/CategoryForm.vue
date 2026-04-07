@@ -80,7 +80,7 @@ const isEditing = computed(() => !!props.category)
 
 <template>
   <form class="category-form" @submit.prevent="handleSubmit" @click.stop>
-    <h2>{{ isEditing ? 'Edytuj kategorie' : 'Nowa kategoria' }}</h2>
+    <h2>{{ isEditing ? 'Edytuj kategorię' : 'Nowa kategoria' }}</h2>
 
     <div class="form-field">
       <label for="cat-name">Nazwa *</label>
@@ -95,9 +95,9 @@ const isEditing = computed(() => !!props.category)
     </div>
 
     <div class="form-field">
-      <label for="cat-parent">Kategoria nadrzedna</label>
+      <label for="cat-parent">Kategoria nadrzędna</label>
       <select id="cat-parent" v-model="parentId">
-        <option :value="null">Brak (kategoria glowna)</option>
+        <option :value="null">Brak (kategoria główna)</option>
         <option
           v-for="option in flatOptions"
           :key="option.id"

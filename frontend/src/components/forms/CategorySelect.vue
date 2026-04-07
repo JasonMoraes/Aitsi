@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
       @click="toggleDropdown"
     >
       <span :class="{ 'category-trigger__placeholder': !selectedLabel }">
-        {{ selectedLabel ?? 'Wybierz kategorie...' }}
+        {{ selectedLabel ?? 'Wybierz kategorię...' }}
       </span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <polyline points="6 9 12 15 18 9" />

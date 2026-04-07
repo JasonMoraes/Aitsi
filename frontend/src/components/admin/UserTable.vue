@@ -35,14 +35,14 @@ function roleBadgeClass(role: string): string {
 
     <!-- Empty state -->
     <div v-else-if="users.length === 0" class="empty-state">
-      <p>Brak uzytkownikow</p>
+      <p>Brak użytkowników</p>
     </div>
 
     <!-- Table -->
     <table v-else class="user-table" role="table">
       <thead>
         <tr>
-          <th>Imie</th>
+          <th>Imię</th>
           <th>Email</th>
           <th>Rola</th>
           <th>Status</th>
@@ -56,7 +56,7 @@ function roleBadgeClass(role: string): string {
           :class="{ 'blocked-row': user.isBlocked }"
           :data-label-name="user.displayName"
         >
-          <td data-label="Imie">{{ user.displayName }}</td>
+          <td data-label="Imię">{{ user.displayName }}</td>
           <td data-label="Email">{{ user.email }}</td>
           <td data-label="Rola">
             <span :class="roleBadgeClass(user.role)">{{ user.role }}</span>

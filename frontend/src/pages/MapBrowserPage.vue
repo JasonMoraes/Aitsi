@@ -139,7 +139,7 @@ function handleMyLocation() {
       mapCenter.value = [pos.coords.latitude, pos.coords.longitude]
       mapZoom.value = 14
     },
-    () => toastStore.show('Nie udalo sie pobrac lokalizacji', 'error')
+    () => toastStore.show('Nie udało się pobrać lokalizacji', 'error')
   )
 }
 
@@ -228,11 +228,11 @@ onMounted(() => {
           </div>
           <div class="map-browser__legend-item">
             <span class="material-symbols-outlined" style="color: var(--primary)">location_on</span>
-            <span>Zdjecie archiwalne z lokalizacja</span>
+            <span>Zdjęcie archiwalne z lokalizacją</span>
           </div>
           <div class="map-browser__legend-item">
             <span class="map-browser__legend-count">{{ photosWithLocation.length }}</span>
-            <span>Zdjec na mapie</span>
+            <span>Zdjęć na mapie</span>
           </div>
         </div>
 

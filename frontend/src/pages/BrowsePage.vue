@@ -91,7 +91,7 @@ watch(filtersOpen, (open) => {
 
 <template>
   <div class="browse container">
-    <h1 class="browse__title">Przegladaj archiwum</h1>
+    <h1 class="browse__title">Przeglądaj archiwum</h1>
 
     <PhotoSearchBar v-model="searchQuery" autofocus @search="handleSearch" />
 
