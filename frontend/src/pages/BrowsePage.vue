@@ -9,6 +9,7 @@ import PhotoSearchBar from '@/components/photos/PhotoSearchBar.vue'
 import PhotoGrid from '@/components/photos/PhotoGrid.vue'
 import PhotoFilters from '@/components/photos/PhotoFilters.vue'
 import AppPagination from '@/components/common/AppPagination.vue'
+import CategoryBreadcrumb from '@/components/categories/CategoryBreadcrumb.vue'
 
 const props = defineProps<{
   categoryId?: string
@@ -33,6 +34,10 @@ const filters = ref({
 })
 
 const currentPage = ref(1)
+
+const breadcrumb = computed(() =>
+  filters.value.categoryId ? categoriesStore.breadcrumbPath(filters.value.categoryId) : []
+)
 
 const activeFilterCount = computed(() => {
   let count = 0
@@ -117,6 +122,8 @@ watch(filtersOpen, (open) => {
       <div v-if="filtersOpen" class="browse__overlay" @click="filtersOpen = false" />
 
       <div class="browse__results">
+        <CategoryBreadcrumb v-if="breadcrumb.length > 0" :path="breadcrumb" class="browse__breadcrumb" />
+
         <p class="browse__count" aria-live="polite">
           {{ t('search.results', { count: photosStore.pagination.totalCount }) }}
         </p>

@@ -21,8 +21,13 @@ async function handleFbToken(accessToken: string) {
     authStore.setAuth(result.token, result.user)
     toastStore.show('Zalogowano pomyslnie!', 'success')
     router.push({ name: 'browse' })
-  } catch (e) {
-    error.value = t('common.error')
+  } catch (e: any) {
+    try {
+      const body = await e?.response?.json()
+      error.value = body?.message ?? t('common.error')
+    } catch {
+      error.value = t('common.error')
+    }
   }
   loading.value = false
 }
@@ -57,8 +62,13 @@ onMounted(() => {
             authStore.setAuth(result.token, result.user)
             toastStore.show('Zalogowano pomyslnie!', 'success')
             router.push({ name: 'browse' })
-          } catch (e) {
-            error.value = t('common.error')
+          } catch (e: any) {
+            try {
+              const body = await e?.response?.json()
+              error.value = body?.message ?? t('common.error')
+            } catch {
+              error.value = t('common.error')
+            }
           }
           loading.value = false
         }

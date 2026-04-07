@@ -95,6 +95,9 @@ public class AuthController : ControllerBase
         }
         else
         {
+            if (user.IsBlocked)
+                return Unauthorized(new { message = "Konto zostało zablokowane. Powód: " + (user.BlockReason ?? "brak podanego powodu") });
+
             user.AvatarUrl = avatarUrl;
             user.DisplayName = name;
             await _db.SaveChangesAsync();
@@ -133,6 +136,9 @@ public class AuthController : ControllerBase
         }
         else
         {
+            if (user.IsBlocked)
+                return Unauthorized(new { message = "Konto zostało zablokowane. Powód: " + (user.BlockReason ?? "brak podanego powodu") });
+
             user.AvatarUrl = avatarUrl;
             user.DisplayName = name;
             if (!string.IsNullOrEmpty(email)) user.Email = email;
