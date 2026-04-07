@@ -60,8 +60,8 @@ public class AuthController : ControllerBase
         user.DisplayName,
         user.AvatarUrl,
         user.Role,
-        user.FacebookId,
-        user.GoogleId
+        HasFacebook = user.FacebookId != null,
+        HasGoogle = user.GoogleId != null
     };
 
     [HttpPost("facebook")]
@@ -109,13 +109,46 @@ public class AuthController : ControllerBase
     [HttpPost("google")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto dto)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jsonToken = handler.ReadJwtToken(dto.Credential);
+        if (string.IsNullOrWhiteSpace(dto.Credential))
+            return BadRequest("Invalid Google credential");
 
-        var googleId = jsonToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-        var name = jsonToken.Claims.FirstOrDefault(c => c.Type == "name")?.Value ?? "User";
-        var email = jsonToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
-        var avatarUrl = jsonToken.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+        // Verify the ID token using Google's tokeninfo endpoint.
+        // This validates the signature, expiry and issuer server-side.
+        string googleId, name, email, avatarUrl;
+        try
+        {
+            using var httpClient = new HttpClient();
+            var tokenInfoResponse = await httpClient.GetAsync(
+                $"https://oauth2.googleapis.com/tokeninfo?id_token={Uri.EscapeDataString(dto.Credential)}");
+
+            if (!tokenInfoResponse.IsSuccessStatusCode)
+                return Unauthorized("Invalid Google credential");
+
+            var tokenInfoJson = await tokenInfoResponse.Content.ReadAsStringAsync();
+            var tokenInfo = JsonDocument.Parse(tokenInfoJson).RootElement;
+
+            // Verify audience matches our configured client ID (if set)
+            var configuredClientId = _config["Google:ClientId"];
+            if (!string.IsNullOrEmpty(configuredClientId))
+            {
+                var aud = tokenInfo.TryGetProperty("aud", out var audProp) ? audProp.GetString() : null;
+                if (aud != configuredClientId)
+                    return Unauthorized("Token audience mismatch");
+            }
+
+            googleId = tokenInfo.TryGetProperty("sub", out var subProp)
+                ? subProp.GetString() ?? string.Empty : string.Empty;
+            name = tokenInfo.TryGetProperty("name", out var nameProp)
+                ? nameProp.GetString() ?? "User" : "User";
+            email = tokenInfo.TryGetProperty("email", out var emailProp)
+                ? emailProp.GetString() ?? string.Empty : string.Empty;
+            avatarUrl = tokenInfo.TryGetProperty("picture", out var picProp)
+                ? picProp.GetString() ?? string.Empty : string.Empty;
+        }
+        catch
+        {
+            return Unauthorized("Google credential validation failed");
+        }
 
         if (string.IsNullOrEmpty(googleId))
             return BadRequest("Invalid Google credential");
@@ -155,6 +188,11 @@ public class AuthController : ControllerBase
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var user = await _db.Users.FindAsync(userId);
         if (user == null) return NotFound();
+
+        // Re-check block status on every request — existing tokens remain valid
+        // after blocking, so we must verify against the database here.
+        if (user.IsBlocked)
+            return Unauthorized(new { message = "Konto zostało zablokowane. Powód: " + (user.BlockReason ?? "brak podanego powodu") });
 
         return Ok(UserResponse(user));
     }
