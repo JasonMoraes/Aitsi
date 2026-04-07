@@ -1,0 +1,1152 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{tocloft}
+
+\geometry{
+  top=2.5cm,
+  bottom=2.5cm,
+  left=3cm,
+  right=2.5cm
+}
+
+% Kolory
+\definecolor{codegreen}{rgb}{0.13,0.54,0.13}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.48,0.0,0.48}
+\definecolor{codeblue}{rgb}{0.0,0.3,0.6}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.95}
+\definecolor{primary}{rgb}{0.0,0.27,0.29}
+
+% Styl kodu
+\lstdefinestyle{csharp}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{gray!30},
+  language=[Sharp]C
+}
+
+\lstdefinestyle{typescript}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{gray!30},
+  language=Java
+}
+
+\lstdefinestyle{plain}{
+  backgroundcolor=\color{backcolour},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray!30},
+}
+
+\lstdefinestyle{html}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray!30},
+  language=HTML
+}
+
+% Nagłówki i stopki
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Cyfrowe Archiwum Społecznościowe}
+\fancyhead[R]{\small Dokumentacja systemu}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Styl tytułów sekcji
+\titleformat{\section}{\large\bfseries\color{primary}}{}{0em}{\thesection\quad}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{\thesubsection\quad}
+\titleformat{\subsubsection}{\normalsize\itshape}{}{0em}{\thesubsubsection\quad}
+
+% Hyperref
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=codeblue,
+  pdftitle={Dokumentacja — Cyfrowe Archiwum Społecznościowe},
+  pdfauthor={},
+}
+
+% Szersza tabela
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% ============================================================
+\begin{document}
+% ============================================================
+
+% Strona tytułowa
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+
+  {\huge\bfseries\color{primary} Cyfrowe Archiwum Społecznościowe\par}
+  \vspace{0.5cm}
+  {\Large Dokumentacja systemu\par}
+  \vspace{3cm}
+
+  \begin{tabular}{ll}
+    \textbf{Wersja:}     & 1.0 \\[4pt]
+    \textbf{Data:}        & \today \\[4pt]
+    \textbf{Backend:}     & ASP.NET Core 8, PostgreSQL \\[4pt]
+    \textbf{Frontend:}    & Vue 3, Vite, TypeScript \\[4pt]
+  \end{tabular}
+
+  \vfill
+  \hrule
+  \vspace{0.4cm}
+  {\small Dokument opisuje architekturę systemu, model danych, strukturę metadanych
+  oraz analizę dostępności zgodną ze standardem WCAG 2.1 AA.}
+\end{titlepage}
+
+% Spis treści
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Opis projektu}
+% ============================================================
+
+Cyfrowe Archiwum Społecznościowe to aplikacja internetowa umożliwiająca lokalnym
+mieszkańcom i pasjonatom historii gromadzenie, opisywanie i udostępnianie zdjęć
+dokumentujących historię i ewolucję danego obszaru geograficznego.
+
+\subsection{Główne założenia}
+
+\begin{itemize}
+  \item \textbf{Dostępność} --- materiały historyczne mają charakter społecznościowy;
+        interfejs musi być prosty i intuicyjny, by mogli z niego korzystać również
+        starsi użytkownicy.
+  \item \textbf{Wyszukiwanie kontekstualne} --- możliwość wyszukiwania według lokalizacji
+        geograficznej, okresu historycznego oraz hierarchicznej struktury obszarów.
+  \item \textbf{Trójpoziomowy model ról} --- zróżnicowane uprawnienia dla Przeglądającego,
+        Twórcy i Administratora.
+  \item \textbf{Publiczne API} --- otwarte wyszukiwanie bez logowania, prywatne API
+        dla zarządzania treścią.
+\end{itemize}
+
+\subsection{Role w systemie}
+
+\begin{table}[H]
+  \centering
+  \caption{Role użytkowników i ich uprawnienia}
+  \begin{tabular}{@{}L{3cm}L{10cm}@{}}
+    \toprule
+    \textbf{Rola} & \textbf{Uprawnienia} \\
+    \midrule
+    Przeglądający & Przeglądanie zdjęć, wyszukiwanie po frazie / kategorii / dacie / tagu \\
+    \addlinespace
+    Twórca        & Wszystkie uprawnienia Przeglądającego + logowanie przez OAuth,
+                    dodawanie / edycja / usuwanie własnych zdjęć, komentowanie \\
+    \addlinespace
+    Administrator & Wszystkie uprawnienia Twórcy + zarządzanie kategoriami,
+                    edycja metadanych dowolnego zdjęcia, usuwanie zdjęć,
+                    blokowanie / odblokowywanie użytkowników \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================================================
+\section{Uzasadnienie przyjętych rozwiązań technicznych}
+% ============================================================
+
+\subsection{Podział na backend i frontend (architektura SPA)}
+
+System zbudowano w architekturze Single Page Application z oddzielnym backendem REST API.
+Podejście to umożliwia:
+
+\begin{itemize}
+  \item niezależne skalowanie warstwy prezentacji i warstwy danych,
+  \item udostępnienie tego samego API innym klientom (np.\ aplikacja mobilna),
+  \item wyraźny kontrakt między warstwami przez typy TypeScript odpowiadające DTOs backendu.
+\end{itemize}
+
+\subsection{ASP.NET Core 8 (backend)}
+
+\begin{itemize}
+  \item \textbf{Entity Framework Core} --- migracje, silnie typowane zapytania LINQ,
+        automatyczna obsługa relacji wiele-do-wielu (\texttt{Photo $\leftrightarrow$ Tag}).
+  \item \textbf{JWT Bearer} --- bezstanowa autoryzacja kompatybilna z zewnętrznymi
+        dostawcami tożsamości (Google, Facebook).
+  \item \textbf{Npgsql / PostgreSQL} --- natywna obsługa typów PostgreSQL, dojrzały
+        driver dla .NET.
+  \item \textbf{Swagger/OpenAPI} --- automatyczna dokumentacja API dostępna pod \texttt{/swagger}.
+\end{itemize}
+
+\subsection{Vue 3 + Vite (frontend)}
+
+\begin{itemize}
+  \item \textbf{Composition API} --- lepsza organizacja logiki przez composables
+        (\texttt{usePhotoSearch}, \texttt{useAnnouncer}, \texttt{usePagination})
+        niż Options API.
+  \item \textbf{Pinia} --- lekki store z pełnym wsparciem TypeScript;
+        jeden store na domenę (photos, categories, auth, theme, fontsize, toast).
+  \item \textbf{Vue Router} --- meta-pola \texttt{requiresAuth} / \texttt{requiresAdmin}
+        obsługiwane przez navigation guards.
+  \item \textbf{ky} --- minimalistyczny klient HTTP oparty na Fetch API.
+\end{itemize}
+
+\subsection{PostgreSQL jako baza danych}
+
+Wybór relacyjnej bazy danych uzasadniony przez:
+
+\begin{itemize}
+  \item złożone relacje (\texttt{User $\to$ Photo $\to$ Category $\to$ Tag $\to$ Comment}),
+  \item konieczność zachowania integralności referencyjnej (DELETE RESTRICT na kategoriach,
+        CASCADE na komentarzach),
+  \item pełnotekstowe wyszukiwanie po polach tekstowych bez dodatkowego silnika,
+  \item hierarchiczna struktura kategorii jako samoreferencja w jednej tabeli.
+\end{itemize}
+
+\subsection{Autoryzacja JWT + OAuth (bez tradycyjnego hasła)}
+
+Zrezygnowano z rejestracji e-mail/hasło na rzecz wyłącznie OAuth (Google, Facebook).
+Uzasadnienie:
+
+\begin{itemize}
+  \item eliminacja konieczności przechowywania haseł i zarządzania ich bezpieczeństwem,
+  \item niższy próg wejścia dla użytkownika --- jedno kliknięcie zamiast formularza,
+  \item weryfikacja adresu e-mail leży po stronie dostawcy tożsamości.
+\end{itemize}
+
+Przy pierwszym logowaniu przez OAuth system automatycznie tworzy konto z rolą \texttt{Creator}.
+
+\subsection{Zmienna precyzja dat}
+
+Materiały historyczne często posiadają nieprecyzyjną datację. Pole \texttt{DatePrecision}
+przyjmuje wartości \texttt{Year}, \texttt{Month}, \texttt{Day}:
+
+\begin{itemize}
+  \item data przechowywana jako string w formacie \texttt{YYYY}, \texttt{YYYY-MM}
+        lub \texttt{YYYY-MM-DD},
+  \item filtrowanie zakresu dat inteligentnie dopełnia datę końcową
+        (np.\ \texttt{"1960"} $\to$ \texttt{"1960-12-31"}),
+  \item komponent \texttt{DatePrecisionPicker} pozwala wybrać granularność.
+\end{itemize}
+
+\subsection{Trzy motywy wizualne}
+
+\begin{table}[H]
+  \centering
+  \caption{Motywy wizualne systemu}
+  \begin{tabular}{@{}L{3.5cm}L{4.5cm}L{5cm}@{}}
+    \toprule
+    \textbf{Motyw} & \textbf{Trigger} & \textbf{Przeznaczenie} \\
+    \midrule
+    \texttt{light} & Domyślny lub \texttt{prefers-color-scheme: light} & Standardowe użytkowanie \\
+    \texttt{dark} & \texttt{prefers-color-scheme: dark} lub ręcznie & Komfort w słabym oświetleniu \\
+    \texttt{high-contrast} & \texttt{prefers-contrast: more} lub ręcznie & Osoby słabowidzące \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Wybór persystowany w \texttt{localStorage} (klucz \texttt{cas\_theme}). Zmiana następuje
+natychmiastowo przez atrybut \texttt{data-theme} na \texttt{<html>} bez przeładowania strony.
+
+% ============================================================
+\section{Architektura systemu}
+% ============================================================
+
+\subsection{Diagram warstw}
+
+\begin{lstlisting}[style=plain, caption={Diagram warstw systemu}]
++-------------------------------------------------+
+|                  Przegladarka                   |
+|  Vue 3 SPA (Vite, Pinia, Vue Router)            |
+|  Port: 5173 (dev) / pliki statyczne (prod)      |
++----------------------+--------------------------+
+                       | HTTP / REST JSON
+                       | Authorization: Bearer <JWT>
++----------------------v--------------------------+
+|           ASP.NET Core 8 Web API                |
+|  Port: 5052                                     |
+|  /api/photos   /api/categories                  |
+|  /api/auth     /api/admin                       |
+|  /api/photos/{id}/comments                      |
+|  Swagger UI: /swagger                           |
+|  Pliki statyczne: /uploads/*                    |
++----------------------+--------------------------+
+                       | EF Core / Npgsql
++----------------------v--------------------------+
+|                  PostgreSQL                     |
+|  Baza: aitsib_db                                |
+|  Tabele: Users, Photos, Categories,             |
+|          Tags, PhotoTags, Comments              |
++-------------------------------------------------+
+\end{lstlisting}
+
+\subsection{Struktura backendu}
+
+\begin{lstlisting}[style=plain, caption={Drzewo katalogów backendu}]
+backend/
+|-- Controllers/
+|   |-- AuthController.cs        logowanie OAuth, /auth/me
+|   |-- PhotosController.cs      CRUD zdjec, wyszukiwanie, upload
+|   |-- CategoriesController.cs  zarzadzanie hierarchia kategorii
+|   |-- CommentsController.cs    komentarze do zdjec
+|   `-- AdminController.cs       panel admina (uzytkownicy, statystyki)
+|-- Models/
+|   |-- User.cs                  enum UserRole, pola OAuth
+|   |-- Photo.cs                 enum DatePrecision, metadane
+|   |-- Category.cs              self-referencing tree
+|   |-- Tag.cs                   tagi (relacja M:N z Photo)
+|   `-- Comment.cs
+|-- Data/
+|   `-- AppDbContext.cs          konfiguracja EF, relacje, seed admina
+|-- Migrations/                  historia schematu bazy
+|-- Program.cs                   konfiguracja DI, JWT, CORS, Swagger
+`-- appsettings.Development.json connection string, klucz JWT
+\end{lstlisting}
+
+\subsection{Struktura frontendu}
+
+\begin{lstlisting}[style=plain, caption={Drzewo katalogów frontendu (src/)}]
+frontend/src/
+|-- pages/             widoki (1 plik = 1 strona/trasa)
+|-- components/
+|   |-- layout/        AppHeader, AppNav, AppFooter, MobileMenu
+|   |-- photos/        PhotoCard, PhotoGrid, PhotoFilters, PhotoSearchBar
+|   |-- forms/         PhotoUploadForm, ImageDropzone, DatePrecisionPicker
+|   |-- categories/    CategoryBreadcrumb, CategoryForm
+|   |-- admin/         AdminPhotoTable, UserTable, BlockUserDialog
+|   `-- common/        AppPagination, AppSpinner, AppToast, SettingsDropdown
+|-- stores/            Pinia stores (1 store = 1 domena)
+|-- composables/
+|   |-- usePhotoSearch.ts   synchronizacja filtrow z URL
+|   |-- useAnnouncer.ts     ARIA live region dla czytnikow ekranu
+|   |-- usePagination.ts
+|   `-- useBreakpoint.ts
+|-- api/               klienci HTTP (1 plik = 1 zasob)
+|-- router/            trasy + navigation guards
+|-- types/             interfejsy TypeScript (DTOs)
+`-- i18n/              tlumaczenia (jezyk polski)
+\end{lstlisting}
+
+\subsection{Przepływ autoryzacji OAuth}
+
+\begin{lstlisting}[style=plain, caption={Sekwencja logowania przez OAuth}]
+Uzytkownik klika "Zaloguj przez Google"
+        |
+        v
+Frontend pobiera token od Google (client-side OAuth flow)
+        |
+        v
+POST /api/auth/google { token: "<google_id_token>" }
+        |
+        v
+Backend weryfikuje token u Google
+-> pobiera email, displayName, avatarUrl
+        |
+        +-- Nowy uzytkownik --> tworzy konto z rola Creator
+        `-- Istniejacy     --> pobiera dane z bazy
+        |
+        v
+Backend zwraca wlasny JWT
+  payload: { userId, email, role }
+        |
+        v
+Frontend zapisuje JWT w localStorage (auth.store)
+        |
+        v
+Kazde kolejne zadanie:
+  Authorization: Bearer <JWT>
+\end{lstlisting}
+
+% ============================================================
+\section{Architektura informacji}
+% ============================================================
+
+\subsection{Hierarchiczna struktura kategorii}
+
+Główną osią organizacji treści jest drzewo kategorii geograficzno-tematycznych.
+Każda kategoria może mieć dowolną liczbę podkategorii, a głębokość drzewa jest
+nieograniczona.
+
+\begin{lstlisting}[style=plain, caption={Przykładowa hierarchia kategorii}]
+Malopolska                        (poziom 1 - region)
+  +-- Krakow                      (poziom 2 - miasto)
+  |     +-- Stare Miasto          (poziom 3 - dzielnica)
+  |     |     +-- Rynek Glowny    (poziom 4 - obiekt)
+  |     |     `-- ul. Florianska
+  |     `-- Kazimierz
+  `-- Zakopane
+        `-- Krupowki
+\end{lstlisting}
+
+Relacja w bazie danych: samoreferencja tabeli \texttt{Categories} przez pole \texttt{ParentId}.
+Usunięcie kategorii jest zablokowane (\texttt{DeleteBehavior.Restrict}) gdy posiada
+podkategorie lub przypisane zdjęcia.
+
+\subsection{Taksonomia i tagowanie}
+
+System stosuje dwie równoległe metody klasyfikacji:
+
+\begin{table}[H]
+  \centering
+  \caption{Porównanie metod klasyfikacji}
+  \begin{tabular}{@{}L{3.5cm}L{3.5cm}L{3cm}L{4cm}@{}}
+    \toprule
+    \textbf{Metoda} & \textbf{Charakter} & \textbf{Zarządzanie} & \textbf{Przykład} \\
+    \midrule
+    Kategoria hierarchiczna & Geograficzna / tematyczna & Administrator & Kraków $>$ Stare Miasto \\
+    \addlinespace
+    Tagi swobodne & Dowolna klasyfikacja & Twórca & \texttt{\#architektura}, \texttt{\#lata60} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Każde zdjęcie musi należeć do dokładnie jednej kategorii i może mieć dowolną liczbę tagów.
+
+\subsection{Ścieżki użytkownika}
+
+\subsubsection{Przeglądający (bez konta)}
+
+\begin{lstlisting}[style=plain]
+Strona glowna (/)
+   |
+   +-- Przegladaj archiwum (/przegladaj)
+   |     +-- Filtruj po kategorii -> /przegladaj/:categoryId
+   |     +-- Filtruj po dacie (od-do)
+   |     +-- Filtruj po tagu
+   |     +-- Szukaj po frazie
+   |     `-- Zdjecie -> /zdjecie/:id
+   |
+   `-- Mapa (/mapa)
+         `-- Pin na mapie -> /zdjecie/:id
+\end{lstlisting}
+
+\subsubsection{Twórca (zalogowany)}
+
+\begin{lstlisting}[style=plain]
+Logowanie (/logowanie)
+   |
+   +-- Moje zdjecia (/moje-zdjecia)
+   |     +-- Dodaj zdjecie -> /dodaj-zdjecie
+   |     `-- Edytuj -> /edytuj-zdjecie/:id
+   |
+   `-- Panel tworcy (/panel-tworcy)
+\end{lstlisting}
+
+\subsubsection{Administrator}
+
+\begin{lstlisting}[style=plain]
+Panel administracyjny (/admin)
+   +-- Zarzadzaj uzytkownikami (/admin/uzytkownicy)
+   |     `-- Blokuj / odblokuj uzytkownika
+   `-- Zarzadzaj kategoriami (/admin/kategorie)
+         +-- Dodaj kategorie
+         +-- Edytuj kategorie
+         `-- Usun kategorie
+\end{lstlisting}
+
+% ============================================================
+\section{Model danych}
+% ============================================================
+
+\subsection{Diagram encji (ERD)}
+
+\begin{lstlisting}[style=plain, caption={Uproszczony diagram encji}]
++------------+       +--------------------------------+
+|    User    |       |             Photo              |
++------------+  1    +--------------------------------+
+| Id (PK)    +--+-->>| AuthorId   (FK -> User)        |
+| Email      |  |    | CategoryId (FK -> Category)    |
+| DisplayName|  |    | Id (PK)                        |
+| Role       |  |    | Title, Description             |
+| AvatarUrl  |  |    | ImagePath, ThumbnailPath       |
+| IsBlocked  |  |    | Date, DatePrecision            |
+| GoogleId   |  |    | Lat, Lng, LocationLabel        |
+| FacebookId |  |    | Technique, InventoryNumber     |
++------------+  |    | OriginalFormat, License        |
+                |    | Digitization, Quote            |
++------------+  |    | CreatedAt                      |
+|  Category  |  |    +----------------+--------------+
++------------+<-+                     |
+| Id (PK)    |                        | M:N
+| Name       |                        v
+| Description|              +---------+--------+
+| ParentId   +--+           |   Tag             |
++------+-----+  |           +-------------------+
+       |        +-->(self)   | Id (PK)           |
+       |                    | Name (UNIQUE)     |
+       |                    +-------------------+
+       |
+       |    +--------------------------------+
+       |    |           Comment              |
+       |    +--------------------------------+
+       |    | Id (PK)                        |
+       +----+ PhotoId (FK -> Photo, CASCADE)  |
+       |    | AuthorId (FK -> User, CASCADE) |
+            | Text, CreatedAt, UpdatedAt     |
+            +--------------------------------+
+\end{lstlisting}
+
+\subsection{Tabela: User}
+
+\begin{table}[H]
+  \centering
+  \caption{Struktura tabeli User}
+  \begin{tabular}{@{}L{3.5cm}L{2.5cm}L{2.5cm}L{5cm}@{}}
+    \toprule
+    \textbf{Kolumna} & \textbf{Typ} & \textbf{Ograniczenia} & \textbf{Opis} \\
+    \midrule
+    \texttt{Id}          & int       & PK, auto     & Klucz główny \\
+    \texttt{Email}       & varchar   & NOT NULL, UNIQUE & E-mail z OAuth \\
+    \texttt{DisplayName} & varchar   & NOT NULL     & Nazwa wyświetlana \\
+    \texttt{Role}        & varchar   & NOT NULL     & \texttt{Viewer / Creator / Admin} \\
+    \texttt{AvatarUrl}   & varchar   & NULL         & URL avatara z OAuth \\
+    \texttt{IsBlocked}   & bool      & NOT NULL     & Czy konto zablokowane \\
+    \texttt{BlockReason} & varchar   & NULL         & Powód blokady \\
+    \texttt{CreatedAt}   & timestamp & NOT NULL     & Data rejestracji (UTC) \\
+    \texttt{GoogleId}    & varchar   & NULL         & ID konta Google \\
+    \texttt{FacebookId}  & varchar   & NULL         & ID konta Facebook \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Tabela: Photo}
+
+\begin{table}[H]
+  \centering
+  \caption{Struktura tabeli Photo}
+  \begin{tabular}{@{}L{3.8cm}L{2.2cm}L{2.3cm}L{5cm}@{}}
+    \toprule
+    \textbf{Kolumna} & \textbf{Typ} & \textbf{Ogr.} & \textbf{Opis} \\
+    \midrule
+    \texttt{Id}              & int       & PK, auto  & Klucz główny \\
+    \texttt{Title}           & varchar   & NOT NULL  & Tytuł zdjęcia \\
+    \texttt{Description}     & text      & NULL      & Opis tekstowy \\
+    \texttt{ImagePath}       & varchar   & NOT NULL  & Ścieżka do pliku \\
+    \texttt{ThumbnailPath}   & varchar   & NOT NULL  & Ścieżka do miniatury \\
+    \texttt{Lat}             & double    & NULL      & Szerokość geogr.\ (WGS84) \\
+    \texttt{Lng}             & double    & NULL      & Długość geogr.\ (WGS84) \\
+    \texttt{LocationLabel}   & varchar   & NULL      & Opis lokalizacji \\
+    \texttt{Date}            & varchar   & NOT NULL  & Data: \texttt{YYYY / YYYY-MM / YYYY-MM-DD} \\
+    \texttt{DatePrecision}   & varchar   & NOT NULL  & \texttt{Year / Month / Day} \\
+    \texttt{Technique}       & varchar   & NULL      & Technika fotograficzna \\
+    \texttt{InventoryNumber} & varchar   & NULL      & Nr inwentarzowy \\
+    \texttt{OriginalFormat}  & varchar   & NULL      & Format oryginału \\
+    \texttt{License}         & varchar   & NULL      & Licencja \\
+    \texttt{Digitization}    & varchar   & NULL      & Parametry digitalizacji \\
+    \texttt{Quote}           & text      & NULL      & Cytat / wspomnienie \\
+    \texttt{CreatedAt}       & timestamp & NOT NULL  & Data dodania (UTC) \\
+    \texttt{AuthorId}        & int       & FK → User & Autor materiału \\
+    \texttt{CategoryId}      & int       & FK → Cat. & Kategoria \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Tabela: Category}
+
+\begin{table}[H]
+  \centering
+  \caption{Struktura tabeli Category}
+  \begin{tabular}{@{}L{3cm}L{2.5cm}L{3cm}L{5cm}@{}}
+    \toprule
+    \textbf{Kolumna} & \textbf{Typ} & \textbf{Ograniczenia} & \textbf{Opis} \\
+    \midrule
+    \texttt{Id}          & int     & PK, auto          & Klucz główny \\
+    \texttt{Name}        & varchar & NOT NULL          & Nazwa kategorii \\
+    \texttt{Description} & text    & NULL              & Opis kategorii \\
+    \texttt{ParentId}    & int     & FK → Cat.\ RESTRICT & Kategoria nadrzędna \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Tabela: Tag}
+
+\begin{table}[H]
+  \centering
+  \caption{Struktura tabeli Tag}
+  \begin{tabular}{@{}L{3cm}L{2.5cm}L{3cm}L{5cm}@{}}
+    \toprule
+    \textbf{Kolumna} & \textbf{Typ} & \textbf{Ograniczenia} & \textbf{Opis} \\
+    \midrule
+    \texttt{Id}   & int     & PK, auto       & Klucz główny \\
+    \texttt{Name} & varchar & NOT NULL, UNIQUE & Nazwa tagu \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Relacja \texttt{Photo $\leftrightarrow$ Tag} jest wielokrotna (M:N).
+Entity Framework Core automatycznie zarządza tabelą pośrednią \texttt{PhotoTag}.
+
+\subsection{Tabela: Comment}
+
+\begin{table}[H]
+  \centering
+  \caption{Struktura tabeli Comment}
+  \begin{tabular}{@{}L{3cm}L{2.5cm}L{3.5cm}L{4.5cm}@{}}
+    \toprule
+    \textbf{Kolumna} & \textbf{Typ} & \textbf{Ograniczenia} & \textbf{Opis} \\
+    \midrule
+    \texttt{Id}        & int       & PK, auto          & Klucz główny \\
+    \texttt{Text}      & text      & NOT NULL          & Treść komentarza \\
+    \texttt{CreatedAt} & timestamp & NOT NULL          & Data dodania (UTC) \\
+    \texttt{UpdatedAt} & timestamp & NULL              & Data edycji (UTC) \\
+    \texttt{PhotoId}   & int       & FK → Photo, CASCADE & Powiązane zdjęcie \\
+    \texttt{AuthorId}  & int       & FK → User, CASCADE  & Autor komentarza \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================================================
+\section{Struktura metadanych}
+% ============================================================
+
+\subsection{Klasyfikacja metadanych}
+
+Metadane zdjęcia podzielono na cztery grupy funkcjonalne:
+
+\subsubsection{Grupa 1: Identyfikacyjne (wymagane)}
+
+\begin{table}[H]
+  \centering
+  \caption{Metadane identyfikacyjne}
+  \begin{tabular}{@{}L{3.5cm}L{5.5cm}L{5cm}@{}}
+    \toprule
+    \textbf{Pole} & \textbf{Opis} & \textbf{Przykład} \\
+    \midrule
+    \texttt{Title}         & Tytuł zdjęcia              & "Rynek Główny w Krakowie, 1965" \\
+    \texttt{CategoryId}    & Przypisanie do hierarchii  & Kraków $>$ Stare Miasto \\
+    \texttt{Date}          & Data wykonania zdjęcia     & \texttt{1965}, \texttt{1965-06} \\
+    \texttt{DatePrecision} & Granularność daty          & \texttt{Year / Month / Day} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Grupa 2: Lokalizacyjne}
+
+\begin{table}[H]
+  \centering
+  \caption{Metadane lokalizacyjne}
+  \begin{tabular}{@{}L{3.5cm}L{5.5cm}L{5cm}@{}}
+    \toprule
+    \textbf{Pole} & \textbf{Opis} & \textbf{Przykład} \\
+    \midrule
+    \texttt{Lat}           & Szerokość geograficzna (WGS84) & \texttt{50.0614} \\
+    \texttt{Lng}           & Długość geograficzna (WGS84)   & \texttt{19.9372} \\
+    \texttt{LocationLabel} & Czytelny opis miejsca          & "Kraków, Rynek Główny" \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Grupa 3: Opisowe}
+
+\begin{table}[H]
+  \centering
+  \caption{Metadane opisowe}
+  \begin{tabular}{@{}L{3.5cm}L{5.5cm}L{5cm}@{}}
+    \toprule
+    \textbf{Pole} & \textbf{Opis} & \textbf{Przykład} \\
+    \midrule
+    \texttt{Description} & Rozbudowany opis tekstowy       & "Widok na fontannę przed renowacją..." \\
+    \texttt{Quote}       & Cytat, wspomnienie, anegdota    & "Mój dziadek pracował w tej kamienicy..." \\
+    \texttt{Tags}        & Swobodne słowa kluczowe         & \texttt{architektura, fontanna, lata-60} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Grupa 4: Techniczne / archiwistyczne}
+
+\begin{table}[H]
+  \centering
+  \caption{Metadane techniczne}
+  \begin{tabular}{@{}L{3.8cm}L{5.2cm}L{5cm}@{}}
+    \toprule
+    \textbf{Pole} & \textbf{Opis} & \textbf{Przykład} \\
+    \midrule
+    \texttt{Technique}       & Technika fotograficzna      & "Odbitka srebrowo-żelatynowa" \\
+    \texttt{OriginalFormat}  & Format fizycznego oryginału & "13$\times$18 cm", "35 mm klisza" \\
+    \texttt{InventoryNumber} & Numer w archiwum            & "HA/2023/K-102" \\
+    \texttt{License}         & Licencja praw autorskich    & "CC BY-NC 4.0" \\
+    \texttt{Digitization}    & Parametry digitalizacji     & "600 DPI, TIFF 16-bit" \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Uzasadnienie struktury metadanych}
+
+\textbf{Zmienna precyzja daty} jest kluczową decyzją projektową. Materiały historyczne
+rzadko posiadają dokładną datację. Przechowywanie daty jako stringa zamiast \texttt{DateTime}
+pozwala na:
+
+\begin{itemize}
+  \item zapis niepełnej daty bez sztucznych wartości domyślnych (np.\ \texttt{1965-01-01}),
+  \item inteligentne filtrowanie zakresów (zapytanie \texttt{dateTo=1970} zwróci
+        wszystkie zdjęcia z lat 60.),
+  \item czytelne wyświetlanie w UI zgodne z tym, co faktycznie wiadomo o zdjęciu.
+\end{itemize}
+
+\textbf{Tagi swobodne} uzupełniają sztywną hierarchię kategorii. Pozwalają na
+przekrojowe wyszukiwanie (np.\ wszystkie zdjęcia z tagiem \texttt{tramwaj} niezależnie
+od lokalizacji) i dają twórcom elastyczność w opisywaniu treści.
+
+\textbf{Metadane archiwistyczne} (InventoryNumber, Technique, OriginalFormat, Digitization)
+są opcjonalne, ale niezbędne dla materiałów z formalnych kolekcji. Umożliwiają zachowanie
+ciągłości z papierową dokumentacją archiwów i bibliotek.
+
+\subsection{Parametry wyszukiwania a pola bazy danych}
+
+\begin{table}[H]
+  \centering
+  \caption{Mapowanie parametrów wyszukiwania na pola bazy danych}
+  \begin{tabular}{@{}L{3.5cm}L{4.5cm}L{5.5cm}@{}}
+    \toprule
+    \textbf{Parametr API} & \textbf{Pola bazy danych} & \textbf{Typ dopasowania} \\
+    \midrule
+    \texttt{q}           & \texttt{Title, Description, LocationLabel} & LIKE (contains) \\
+    \texttt{categoryId}  & \texttt{CategoryId}                         & Równość \\
+    \texttt{tag}         & \texttt{Tags.Name}                          & Równość (relacja M:N) \\
+    \texttt{dateFrom}    & \texttt{Date}                               & Porównanie leksykograficzne \\
+    \texttt{dateTo}      & \texttt{Date}                               & Porównanie leksykograficzne \\
+    \texttt{sortBy=date} & \texttt{Date}                               & Porządkowanie leksykograficzne \\
+    \texttt{sortBy=createdAt} & \texttt{CreatedAt}                     & Porządkowanie chronologiczne \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================================================
+\section{Dokumentacja API}
+% ============================================================
+
+Baza URL: \texttt{http://localhost:5052/api} (środowisko development).
+
+\subsection{Legenda dostępu}
+
+\begin{table}[H]
+  \centering
+  \caption{Poziomy dostępu do endpointów}
+  \begin{tabular}{@{}L{3.5cm}L{10cm}@{}}
+    \toprule
+    \textbf{Symbol} & \textbf{Znaczenie} \\
+    \midrule
+    \textbf{[PUBLICZNY]} & Dostęp bez logowania — część publicznego API REST \\
+    \textbf{[TWÓRCA]}    & Wymaga nagłówka \texttt{Authorization: Bearer <JWT>} \\
+    \textbf{[ADMIN]}     & Wymaga JWT z claimem roli \texttt{admin} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Autentykacja (\texttt{/api/auth})}
+
+\begin{table}[H]
+  \centering
+  \caption{Endpointy autentykacji}
+  \begin{tabular}{@{}L{1.5cm}L{4cm}L{2.5cm}L{6cm}@{}}
+    \toprule
+    \textbf{Met.} & \textbf{Endpoint} & \textbf{Dostęp} & \textbf{Opis} \\
+    \midrule
+    POST & \texttt{/api/auth/google}   & \textbf{[PUBLICZNY]} & Logowanie przez Google OAuth. Body: \texttt{\{ "credential": "..." \}} \\
+    POST & \texttt{/api/auth/facebook} & \textbf{[PUBLICZNY]} & Logowanie przez Facebook. Body: \texttt{\{ "accessToken": "..." \}} \\
+    GET  & \texttt{/api/auth/me}       & \textbf{[TWÓRCA]}    & Dane zalogowanego użytkownika \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Zdjęcia (\texttt{/api/photos})}
+
+\begin{table}[H]
+  \centering
+  \caption{Endpointy zarządzania zdjęciami}
+  \begin{tabular}{@{}L{1.5cm}L{4.5cm}L{2.5cm}L{5.5cm}@{}}
+    \toprule
+    \textbf{Met.} & \textbf{Endpoint} & \textbf{Dostęp} & \textbf{Opis} \\
+    \midrule
+    GET    & \texttt{/api/photos}        & \textbf{[PUBLICZNY]}         & Wyszukiwanie i paginacja zdjęć \\
+    GET    & \texttt{/api/photos/\{id\}} & \textbf{[PUBLICZNY]}         & Pełne metadane zdjęcia \\
+    GET    & \texttt{/api/photos/my}     & \textbf{[TWÓRCA]}            & Lista własnych zdjęć \\
+    POST   & \texttt{/api/photos}        & \textbf{[TWÓRCA]}            & Upload nowego zdjęcia (\texttt{multipart/form-data}) \\
+    PUT    & \texttt{/api/photos/\{id\}} & \textbf{[TWÓRCA / ADMIN]}    & Edycja metadanych (autor: własne; admin: dowolne) \\
+    DELETE & \texttt{/api/photos/\{id\}} & \textbf{[TWÓRCA / ADMIN]}    & Usunięcie zdjęcia z dysku (autor: własne; admin: dowolne) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Parametry \texttt{GET /api/photos}}
+
+\begin{table}[H]
+  \centering
+  \caption{Parametry wyszukiwania zdjęć}
+  \begin{tabular}{@{}L{3cm}L{2cm}L{9cm}@{}}
+    \toprule
+    \textbf{Parametr} & \textbf{Typ} & \textbf{Opis} \\
+    \midrule
+    \texttt{q}          & string & Wyszukiwanie pełnotekstowe po \texttt{Title}, \texttt{Description}, \texttt{LocationLabel} \\
+    \texttt{categoryId} & int    & Filtrowanie po kategorii (tylko dokładne dopasowanie) \\
+    \texttt{tag}        & string & Filtrowanie po nazwie tagu (np.\ \texttt{?tag=architektura}) \\
+    \texttt{dateFrom}   & string & Dolna granica daty: \texttt{YYYY}, \texttt{YYYY-MM} lub \texttt{YYYY-MM-DD} \\
+    \texttt{dateTo}     & string & Górna granica daty (rok dopełniany do \texttt{YYYY-12-31}) \\
+    \texttt{sortBy}     & string & \texttt{date} lub \texttt{createdAt} (domyślnie: \texttt{createdAt}) \\
+    \texttt{sortDir}    & string & \texttt{asc} lub \texttt{desc} (domyślnie: \texttt{desc}) \\
+    \texttt{page}       & int    & Numer strony (domyślnie: 1) \\
+    \texttt{pageSize}   & int    & Wyników na stronę (domyślnie: 12) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Body \texttt{POST /api/photos} (\texttt{multipart/form-data})}
+
+\begin{table}[H]
+  \centering
+  \caption{Pola formularza uploadu zdjęcia}
+  \begin{tabular}{@{}L{3.5cm}L{2cm}L{8.5cm}@{}}
+    \toprule
+    \textbf{Pole} & \textbf{Wymagane} & \textbf{Opis} \\
+    \midrule
+    \texttt{file}            & tak & Plik obrazu (jpg, png, webp itp.) \\
+    \texttt{title}           & tak & Tytuł zdjęcia (max 200 znaków) \\
+    \texttt{categoryId}      & tak & ID kategorii hierarchicznej \\
+    \texttt{date}            & tak & Data: \texttt{YYYY}, \texttt{YYYY-MM} lub \texttt{YYYY-MM-DD} \\
+    \texttt{description}     & nie & Opis tekstowy (max 2000 znaków) \\
+    \texttt{lat}             & nie & Szerokość geograficzna \\
+    \texttt{lng}             & nie & Długość geograficzna \\
+    \texttt{locationLabel}   & nie & Czytelny opis lokalizacji \\
+    \texttt{technique}       & nie & Technika fotograficzna \\
+    \texttt{quote}           & nie & Cytat / wspomnienie (max 1000 znaków) \\
+    \texttt{inventoryNumber} & nie & Numer inwentarzowy \\
+    \texttt{originalFormat}  & nie & Format oryginału \\
+    \texttt{license}         & nie & Licencja \\
+    \texttt{digitization}    & nie & Informacje o digitalizacji \\
+    \texttt{tags}            & nie & Tagi rozdzielone przecinkami \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Kategorie (\texttt{/api/categories})}
+
+\begin{table}[H]
+  \centering
+  \caption{Endpointy zarządzania kategoriami}
+  \begin{tabular}{@{}L{1.5cm}L{5cm}L{2.5cm}L{5cm}@{}}
+    \toprule
+    \textbf{Met.} & \textbf{Endpoint} & \textbf{Dostęp} & \textbf{Opis} \\
+    \midrule
+    GET    & \texttt{/api/categories}        & \textbf{[PUBLICZNY]} & Płaska lista wszystkich kategorii \\
+    GET    & \texttt{/api/categories/\{id\}} & \textbf{[PUBLICZNY]} & Szczegóły kategorii \\
+    POST   & \texttt{/api/categories}        & \textbf{[ADMIN]}     & Utworzenie kategorii \\
+    PUT    & \texttt{/api/categories/\{id\}} & \textbf{[ADMIN]}     & Edycja kategorii \\
+    DELETE & \texttt{/api/categories/\{id\}} & \textbf{[ADMIN]}     & Usunięcie (blokowane przez RESTRICT) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Komentarze}
+
+\begin{table}[H]
+  \centering
+  \caption{Endpointy komentarzy}
+  \begin{tabular}{@{}L{1.5cm}L{5.5cm}L{2.5cm}L{4.5cm}@{}}
+    \toprule
+    \textbf{Met.} & \textbf{Endpoint} & \textbf{Dostęp} & \textbf{Opis} \\
+    \midrule
+    GET    & \texttt{/api/photos/\{photoId\}/comments} & \textbf{[PUBLICZNY]}      & Lista komentarzy do zdjęcia \\
+    POST   & \texttt{/api/photos/\{photoId\}/comments} & \textbf{[TWÓRCA]}         & Dodanie komentarza \\
+    PUT    & \texttt{/api/comments/\{id\}}             & \textbf{[TWÓRCA / ADMIN]} & Edycja (autor: własne; admin: dowolne) \\
+    DELETE & \texttt{/api/comments/\{id\}}             & \textbf{[TWÓRCA / ADMIN]} & Usunięcie (autor: własne; admin: dowolne) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Administracja (\texttt{/api/admin})}
+
+Wszystkie endpointy tej grupy wymagają roli \texttt{admin}.
+
+\begin{table}[H]
+  \centering
+  \caption{Endpointy panelu administracyjnego}
+  \begin{tabular}{@{}L{1.5cm}L{5.5cm}L{2cm}L{5cm}@{}}
+    \toprule
+    \textbf{Met.} & \textbf{Endpoint} & \textbf{Dostęp} & \textbf{Opis} \\
+    \midrule
+    GET & \texttt{/api/admin/users}                   & \textbf{[ADMIN]} & Paginowana lista użytkowników (\texttt{page}, \texttt{pageSize}) \\
+    PUT & \texttt{/api/admin/users/\{id\}/block}      & \textbf{[ADMIN]} & Blokada użytkownika. Body: \texttt{\{ "reason": "..." \}} \\
+    PUT & \texttt{/api/admin/users/\{id\}/unblock}    & \textbf{[ADMIN]} & Odblokowanie użytkownika \\
+    GET & \texttt{/api/admin/stats}                   & \textbf{[ADMIN]} & Statystyki: \texttt{totalPhotos}, \texttt{totalUsers}, \texttt{blockedUsers} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Autoryzacja — szczegóły tokenu JWT}
+
+Token generowany algorytmem HMAC-SHA256, ważny przez 30 dni. Payload:
+
+\begin{lstlisting}[style=plain, caption={Payload tokenu JWT}]
+{
+  "nameid":      "5",          // userId
+  "unique_name": "Jan Kowalski",
+  "role":        "creator",    // viewer | creator | admin
+  "exp":         1753000000
+}
+\end{lstlisting}
+
+Przekazywany w nagłówku każdego chronionego żądania:
+\begin{lstlisting}[style=plain]
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+\end{lstlisting}
+
+\subsection{Zestawienie wszystkich endpointów}
+
+\begin{longtable}{@{}L{1.3cm}L{6.2cm}L{1.6cm}L{1.6cm}L{1.6cm}@{}}
+  \caption{Kompletna tabela endpointów z poziomem dostępu} \\
+  \toprule
+  \textbf{Met.} & \textbf{Endpoint} & \textbf{Pub.} & \textbf{Twórca} & \textbf{Admin} \\
+  \midrule
+  \endfirsthead
+  \multicolumn{5}{c}{\tablename\ \thetable{} — ciąg dalszy} \\
+  \toprule
+  \textbf{Met.} & \textbf{Endpoint} & \textbf{Pub.} & \textbf{Twórca} & \textbf{Admin} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  POST   & \texttt{/api/auth/google}                     & \checkmark & & \\
+  POST   & \texttt{/api/auth/facebook}                   & \checkmark & & \\
+  GET    & \texttt{/api/auth/me}                         & & \checkmark & \\
+  GET    & \texttt{/api/photos}                          & \checkmark & & \\
+  GET    & \texttt{/api/photos/\{id\}}                   & \checkmark & & \\
+  GET    & \texttt{/api/photos/my}                       & & \checkmark & \\
+  POST   & \texttt{/api/photos}                          & & \checkmark & \\
+  PUT    & \texttt{/api/photos/\{id\}}                   & & \checkmark (własne) & \checkmark (wszystkie) \\
+  DELETE & \texttt{/api/photos/\{id\}}                   & & \checkmark (własne) & \checkmark (wszystkie) \\
+  GET    & \texttt{/api/categories}                      & \checkmark & & \\
+  GET    & \texttt{/api/categories/\{id\}}               & \checkmark & & \\
+  POST   & \texttt{/api/categories}                      & & & \checkmark \\
+  PUT    & \texttt{/api/categories/\{id\}}               & & & \checkmark \\
+  DELETE & \texttt{/api/categories/\{id\}}               & & & \checkmark \\
+  GET    & \texttt{/api/photos/\{photoId\}/comments}     & \checkmark & & \\
+  POST   & \texttt{/api/photos/\{photoId\}/comments}     & & \checkmark & \\
+  PUT    & \texttt{/api/comments/\{id\}}                 & & \checkmark (własne) & \checkmark (wszystkie) \\
+  DELETE & \texttt{/api/comments/\{id\}}                 & & \checkmark (własne) & \checkmark (wszystkie) \\
+  GET    & \texttt{/api/admin/users}                     & & & \checkmark \\
+  PUT    & \texttt{/api/admin/users/\{id\}/block}        & & & \checkmark \\
+  PUT    & \texttt{/api/admin/users/\{id\}/unblock}      & & & \checkmark \\
+  GET    & \texttt{/api/admin/stats}                     & & & \checkmark \\
+\end{longtable}
+
+\textbf{Łącznie: 22 endpointy} — 7~publicznych, 6~wyłącznie dla twórcy, 9~wyłącznie dla admina.
+
+% ============================================================
+\section{Analiza dostępności informacji (WCAG 2.1 AA)}
+% ============================================================
+
+\subsection{Przegląd}
+
+Standard WCAG 2.1 poziom AA obejmuje cztery zasady: \textbf{Postrzegalność},
+\textbf{Funkcjonalność}, \textbf{Zrozumiałość} i \textbf{Solidność} (POUR).
+
+\subsection{Postrzegalność (Perceivable)}
+
+\subsubsection{1.1.1 — Treść nietekstowa (poziom A)}
+
+Wszystkie zdjęcia posiadają obowiązkowy atrybut \texttt{alt} ustawiony na tytuł zdjęcia.
+Ikony dekoracyjne oznaczone są \texttt{aria-hidden="true"}.
+
+\begin{lstlisting}[style=html, caption={Przykład atrybutu alt}]
+<img :src="photo.thumbnailUrl" :alt="photo.title" />
+<span class="material-symbols-outlined" aria-hidden="true">delete</span>
+\end{lstlisting}
+
+\subsubsection{1.3.1 — Informacje i relacje (poziom A)}
+
+Formularze używają jawnych elementów \texttt{<label for="...">} powiązanych z polami
+przez atrybut \texttt{id}. Strona używa semantycznego HTML5: \texttt{<nav>}, \texttt{<main>},
+\texttt{<header>}, \texttt{<footer>}, \texttt{<aside>}, \texttt{<section>}.
+
+\begin{lstlisting}[style=html, caption={Jawne etykiety formularza}]
+<label for="pu-title">Tytul zdjecia *</label>
+<input id="pu-title" v-model="form.title" type="text" required />
+\end{lstlisting}
+
+\subsubsection{1.4.3 — Kontrast (poziom AA)}
+
+\begin{table}[H]
+  \centering
+  \caption{Kontrast kolorów w poszczególnych motywach}
+  \begin{tabular}{@{}L{3.5cm}L{2.5cm}L{2.5cm}L{2.5cm}L{3cm}@{}}
+    \toprule
+    \textbf{Motyw} & \textbf{Tekst} & \textbf{Tło} & \textbf{Wsp.\ kontrastu} & \textbf{Status} \\
+    \midrule
+    \texttt{light}         & \texttt{\#1c1c17} & \texttt{\#fcf9f1} & $\approx$17:1 & \checkmark \\
+    \texttt{dark}          & \texttt{\#e8e5d8} & \texttt{\#1a1a14} & $\approx$14:1 & \checkmark \\
+    \texttt{high-contrast} & \texttt{\#00ffff} & \texttt{\#000000} & 21:1          & \checkmark \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{1.4.4 — Zmiana rozmiaru tekstu (poziom AA)}
+
+System udostępnia trzy rozmiary czcionki: \texttt{small}, \texttt{normal}, \texttt{large}
+(przełączane przez \texttt{SettingsDropdown}). Typografia zbudowana jest na CSS
+\texttt{clamp()} i zmiennych CSS. Wybór persystowany w \texttt{localStorage}
+(klucz \texttt{cas\_fontsize}).
+
+\subsection{Funkcjonalność (Operable)}
+
+\subsubsection{2.1.1 — Klawiatura (poziom A)}
+
+Wszystkie interaktywne elementy są dostępne przez klawiaturę:
+
+\begin{itemize}
+  \item fokus klawiatury widoczny przez \texttt{box-shadow: var(--focus-ring)}
+        na wszystkich elementach \texttt{:focus-visible},
+  \item menu mobilne zarządza \texttt{tabindex} elementów wewnątrz
+        (\texttt{-1} gdy zamknięte, \texttt{0} gdy otwarte),
+  \item dialogi (\texttt{BlockUserDialog}) ustawiają \texttt{aria-modal="true"}.
+\end{itemize}
+
+\subsubsection{2.4.1 — Pomijanie bloków (poziom A)}
+
+Skip-link „Przejdź do treści" dostępny jako pierwszy element na stronie.
+Widoczny tylko przy fokusie klawiatury:
+
+\begin{lstlisting}[style=html, caption={Implementacja skip-linka}]
+<!-- App.vue -->
+<a href="#main-content" class="skip-link">Przejdz do tresci</a>
+
+/* CSS */
+.skip-link {
+  position: absolute;
+  top: -100%;
+}
+.skip-link:focus {
+  top: 8px;
+}
+\end{lstlisting}
+
+\subsubsection{2.4.6 — Nagłówki i etykiety (poziom AA)}
+
+Każda strona posiada jeden nagłówek \texttt{<h1>}. Hierarchia
+\texttt{h1} $\to$ \texttt{h2} $\to$ \texttt{h3} jest zachowana.
+
+\subsection{Zrozumiałość (Understandable)}
+
+\subsubsection{3.1.1 — Język strony (poziom A)}
+
+Atrybut \texttt{lang="pl"} na elemencie \texttt{<html>}. Cały interfejs jest w języku
+polskim, obsługiwany przez Vue i18n.
+
+\subsubsection{3.3.1 — Identyfikacja błędu (poziom A)}
+
+Błędy walidacji wyświetlane w elemencie \texttt{<p role="alert">} bezpośrednio
+pod polem. Toast z komunikatem błędu posiada \texttt{aria-live="assertive"}.
+
+\subsection{Solidność (Robust)}
+
+\subsubsection{4.1.2 — Nazwa, rola, wartość (poziom A)}
+
+Komponenty interaktywne używają natywnych elementów HTML. Przyciski przełączające
+używają \texttt{aria-pressed}:
+
+\begin{lstlisting}[style=html, caption={Użycie aria-pressed na chipach filtrów}]
+<button :aria-pressed="categoryId === cat.id">
+  {{ cat.name }}
+</button>
+\end{lstlisting}
+
+\subsubsection{4.1.3 — Komunikaty o stanie (poziom AA)}
+
+Composable \texttt{useAnnouncer} zarządza regionem ARIA live. Zmiany liczby wyników,
+wysyłka formularzy i komunikaty o błędach są ogłaszane przez czytniki ekranu
+bez przenoszenia fokusu:
+
+\begin{lstlisting}[style=html, caption={Region ARIA live w App.vue}]
+<div class="sr-only"
+     :aria-live="politeness"
+     aria-atomic="true"
+     role="status">
+  {{ announcement }}
+</div>
+\end{lstlisting}
+
+\subsection{Zestawienie kryteriów WCAG 2.1 AA}
+
+\begin{longtable}{@{}L{2.5cm}L{7cm}L{2cm}@{}}
+  \caption{Status realizacji kryteriów WCAG 2.1 AA} \\
+  \toprule
+  \textbf{Kryterium} & \textbf{Opis} & \textbf{Status} \\
+  \midrule
+  \endfirsthead
+  \multicolumn{3}{c}{\tablename\ \thetable{} — ciąg dalszy} \\
+  \toprule
+  \textbf{Kryterium} & \textbf{Opis} & \textbf{Status} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  1.1.1 & Treść nietekstowa (alt)                      & \checkmark \\
+  1.3.1 & Informacje i relacje (semantyka HTML, label)  & \checkmark \\
+  1.3.4 & Orientacja (brak blokady)                     & \checkmark \\
+  1.4.1 & Użycie koloru (nie jedyny nośnik informacji)  & \checkmark \\
+  1.4.3 & Kontrast tekstu (trzy motywy)                 & \checkmark \\
+  1.4.4 & Zmiana rozmiaru tekstu (trzy skale)           & \checkmark \\
+  1.4.10 & Przepływ tekstu (responsywny layout)         & \checkmark \\
+  1.4.11 & Kontrast elementów nietekstowych             & \checkmark \\
+  1.4.12 & Odstępy w tekście (brak blokady CSS)         & \checkmark \\
+  2.1.1 & Klawiatura                                    & \checkmark \\
+  2.1.2 & Brak pułapki klawiaturowej                    & \checkmark \\
+  2.3.3 & Animacja z interakcji (\texttt{prefers-reduced-motion}) & \checkmark \\
+  2.4.1 & Pomijanie bloków (skip-link)                  & \checkmark \\
+  2.4.3 & Kolejność fokusu (logiczna kolejność DOM)     & \checkmark \\
+  2.4.4 & Cel linku                                     & \checkmark \\
+  2.4.6 & Nagłówki i etykiety                           & \checkmark \\
+  2.4.7 & Widoczny fokus (focus-ring)                   & \checkmark \\
+  3.1.1 & Język strony (\texttt{lang="pl"})             & \checkmark \\
+  3.2.1 & Po fokusie (brak auto zmian kontekstu)        & \checkmark \\
+  3.3.1 & Identyfikacja błędu (\texttt{role="alert"})   & \checkmark \\
+  3.3.2 & Etykiety lub instrukcje                       & \checkmark \\
+  4.1.1 & Parsowanie (poprawny HTML)                    & \checkmark \\
+  4.1.2 & Nazwa, rola, wartość (natywne elementy + ARIA)& \checkmark \\
+  4.1.3 & Komunikaty o stanie (\texttt{useAnnouncer})   & \checkmark \\
+\end{longtable}
+
+% ============================================================
+\end{document}

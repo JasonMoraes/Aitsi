@@ -8,7 +8,8 @@
 4. [Architektura informacji](#4-architektura-informacji)
 5. [Model danych](#5-model-danych)
 6. [Struktura metadanych](#6-struktura-metadanych)
-7. [Analiza dostępności informacji (WCAG 2.1 AA)](#7-analiza-dostępności-informacji-wcag-21-aa)
+7. [Dokumentacja API](#7-dokumentacja-api)
+8. [Analiza dostępności informacji (WCAG 2.1 AA)](#8-analiza-dostępności-informacji-wcag-21-aa)
 
 ---
 
@@ -510,7 +511,245 @@ Współrzędne umożliwiają wyświetlenie na mapie (Leaflet) i filtrowanie prze
 
 ---
 
-## 7. Analiza dostępności informacji (WCAG 2.1 AA)
+## 7. Dokumentacja API
+
+Baza URL: `http://localhost:5052/api` (development).
+
+### Legenda dostępu
+
+| Symbol | Znaczenie |
+|--------|-----------|
+| 🟢 **PUBLICZNY** | Dostęp bez logowania — część publicznego API |
+| 🔒 **TWÓRCA** | Wymaga JWT (`Authorization: Bearer <token>`) |
+| 🔴 **ADMIN** | Wymaga JWT z rolą `admin` |
+
+---
+
+### 7.1 Autentykacja (`/api/auth`)
+
+| Metoda | Endpoint | Dostęp | Opis |
+|--------|----------|--------|------|
+| `POST` | `/api/auth/google` | 🟢 **PUBLICZNY** | Logowanie / rejestracja przez Google OAuth. Body: `{ "credential": "<google_id_token>" }`. Zwraca JWT + dane użytkownika. |
+| `POST` | `/api/auth/facebook` | 🟢 **PUBLICZNY** | Logowanie / rejestracja przez Facebook. Body: `{ "accessToken": "<fb_access_token>" }`. Zwraca JWT + dane użytkownika. |
+| `GET` | `/api/auth/me` | 🔒 **TWÓRCA** | Dane zalogowanego użytkownika (id, displayName, avatarUrl, role). |
+
+---
+
+### 7.2 Zdjęcia (`/api/photos`)
+
+| Metoda | Endpoint | Dostęp | Opis |
+|--------|----------|--------|------|
+| `GET` | `/api/photos` | 🟢 **PUBLICZNY** | Wyszukiwanie i paginacja zdjęć. Parametry query opisane poniżej. |
+| `GET` | `/api/photos/{id}` | 🟢 **PUBLICZNY** | Szczegóły pojedynczego zdjęcia — pełne metadane, tagi, autor, kategoria. |
+| `GET` | `/api/photos/my` | 🔒 **TWÓRCA** | Lista własnych zdjęć zalogowanego użytkownika (z paginacją). |
+| `POST` | `/api/photos` | 🔒 **TWÓRCA** | Upload nowego zdjęcia. Body: `multipart/form-data`. Pola opisane poniżej. |
+| `PUT` | `/api/photos/{id}` | 🔒 **TWÓRCA / ADMIN** | Edycja metadanych zdjęcia. Autor może edytować tylko swoje zdjęcia; admin — dowolne. Body: `application/json`. |
+| `DELETE` | `/api/photos/{id}` | 🔒 **TWÓRCA / ADMIN** | Usunięcie zdjęcia wraz z plikiem z dysku. Autor może usuwać tylko swoje; admin — dowolne. |
+
+#### Parametry `GET /api/photos`
+
+| Parametr | Typ | Opis |
+|----------|-----|------|
+| `q` | string | Wyszukiwanie pełnotekstowe po polach `Title`, `Description`, `LocationLabel` |
+| `categoryId` | int | Filtrowanie po kategorii (tylko dokładna kategoria, bez podkategorii) |
+| `tag` | string | Filtrowanie po nazwie tagu (np. `?tag=architektura`) |
+| `dateFrom` | string | Dolna granica daty — format `YYYY`, `YYYY-MM` lub `YYYY-MM-DD` |
+| `dateTo` | string | Górna granica daty — format `YYYY`, `YYYY-MM` lub `YYYY-MM-DD`; rok dopełniany do `YYYY-12-31` |
+| `sortBy` | string | Pole sortowania: `date` \| `createdAt` (domyślnie: `createdAt`) |
+| `sortDir` | string | Kierunek: `asc` \| `desc` (domyślnie: `desc`) |
+| `page` | int | Numer strony (domyślnie: `1`) |
+| `pageSize` | int | Wyników na stronę (domyślnie: `12`) |
+
+#### Body `POST /api/photos` (`multipart/form-data`)
+
+| Pole | Wymagane | Opis |
+|------|----------|------|
+| `file` | ✅ | Plik obrazu (jpg, png, webp itp.) |
+| `title` | ✅ | Tytuł zdjęcia (max 200 znaków) |
+| `categoryId` | ✅ | ID kategorii hierarchicznej |
+| `date` | ✅ | Data: `YYYY`, `YYYY-MM` lub `YYYY-MM-DD` |
+| `description` | — | Opis tekstowy (max 2000 znaków) |
+| `lat` | — | Szerokość geograficzna |
+| `lng` | — | Długość geograficzna |
+| `locationLabel` | — | Czytelny opis lokalizacji |
+| `technique` | — | Technika fotograficzna |
+| `quote` | — | Cytat / wspomnienie (max 1000 znaków) |
+| `inventoryNumber` | — | Numer inwentarzowy |
+| `originalFormat` | — | Format oryginału |
+| `license` | — | Licencja |
+| `digitization` | — | Informacje o digitalizacji |
+| `tags` | — | Tagi rozdzielone przecinkami (np. `architektura, transport`) |
+
+#### Body `PUT /api/photos/{id}` (`application/json`)
+
+Wszystkie pola opcjonalne (semantyka PATCH — przesyłane są tylko zmieniające się wartości):
+
+```json
+{
+  "title": "Nowy tytuł",
+  "description": "Opis...",
+  "categoryId": 3,
+  "date": "1965-06",
+  "lat": 50.0614,
+  "lng": 19.9372,
+  "locationLabel": "Kraków, Rynek Główny",
+  "technique": "Sepia",
+  "quote": "Wspomnienie...",
+  "inventoryNumber": "HA/2023/K-102",
+  "originalFormat": "13x18 cm",
+  "license": "CC BY-NC 4.0",
+  "digitization": "600 DPI",
+  "tags": "architektura, lata60"
+}
+```
+
+---
+
+### 7.3 Kategorie (`/api/categories`)
+
+| Metoda | Endpoint | Dostęp | Opis |
+|--------|----------|--------|------|
+| `GET` | `/api/categories` | 🟢 **PUBLICZNY** | Płaska lista wszystkich kategorii (z polami `id`, `name`, `description`, `parentId`). |
+| `GET` | `/api/categories/{id}` | 🟢 **PUBLICZNY** | Szczegóły pojedynczej kategorii. |
+| `POST` | `/api/categories` | 🔴 **ADMIN** | Utworzenie nowej kategorii. Body: `{ "name": "...", "parentId": 2, "description": "..." }`. `parentId` = null dla kategorii korzenia. |
+| `PUT` | `/api/categories/{id}` | 🔴 **ADMIN** | Edycja kategorii. Body jak przy POST. |
+| `DELETE` | `/api/categories/{id}` | 🔴 **ADMIN** | Usunięcie kategorii. Zablokowane jeśli posiada podkategorie lub przypisane zdjęcia (`RESTRICT`). |
+
+---
+
+### 7.4 Komentarze (`/api/photos/{photoId}/comments`, `/api/comments`)
+
+| Metoda | Endpoint | Dostęp | Opis |
+|--------|----------|--------|------|
+| `GET` | `/api/photos/{photoId}/comments` | 🟢 **PUBLICZNY** | Lista komentarzy do zdjęcia, posortowana chronologicznie. |
+| `POST` | `/api/photos/{photoId}/comments` | 🔒 **TWÓRCA** | Dodanie komentarza. Body: `{ "text": "..." }`. |
+| `PUT` | `/api/comments/{id}` | 🔒 **TWÓRCA / ADMIN** | Edycja komentarza. Autor może edytować tylko swój; admin — dowolny. Body: `{ "text": "..." }`. |
+| `DELETE` | `/api/comments/{id}` | 🔒 **TWÓRCA / ADMIN** | Usunięcie komentarza. Autor — tylko swój; admin — dowolny. |
+
+---
+
+### 7.5 Administracja (`/api/admin`)
+
+Wszystkie endpointy wymagają roli `admin`.
+
+| Metoda | Endpoint | Dostęp | Opis |
+|--------|----------|--------|------|
+| `GET` | `/api/admin/users` | 🔴 **ADMIN** | Paginowana lista użytkowników z polami: id, email, displayName, role, isBlocked, blockReason, createdAt. Parametry: `page`, `pageSize` (domyślnie 20). |
+| `PUT` | `/api/admin/users/{id}/block` | 🔴 **ADMIN** | Zablokowanie użytkownika. Body: `{ "reason": "Powód blokady" }`. |
+| `PUT` | `/api/admin/users/{id}/unblock` | 🔴 **ADMIN** | Odblokowanie użytkownika. |
+| `GET` | `/api/admin/stats` | 🔴 **ADMIN** | Statystyki systemu: `totalPhotos`, `totalUsers`, `blockedUsers`. |
+
+---
+
+### 7.6 Przykładowe odpowiedzi
+
+#### `GET /api/photos` (odpowiedź stronicowana)
+
+```json
+{
+  "items": [
+    {
+      "id": 42,
+      "title": "Rynek Główny, 1965",
+      "description": "Widok na fontannę z Neptunem...",
+      "imagePath": "/uploads/abc123.jpg",
+      "thumbnailPath": "/uploads/abc123.jpg",
+      "lat": 50.0614,
+      "lng": 19.9372,
+      "locationLabel": "Kraków, Rynek Główny",
+      "date": "1965",
+      "datePrecision": "year",
+      "technique": null,
+      "inventoryNumber": null,
+      "originalFormat": null,
+      "license": null,
+      "digitization": null,
+      "quote": null,
+      "createdAt": "2026-03-25T13:32:00Z",
+      "authorId": 5,
+      "categoryId": 3,
+      "author": { "id": 5, "displayName": "Jan Kowalski" },
+      "category": { "id": 3, "name": "Stare Miasto" },
+      "tags": [{ "id": 1, "name": "architektura" }]
+    }
+  ],
+  "page": 1,
+  "pageSize": 12,
+  "totalCount": 87,
+  "totalPages": 8
+}
+```
+
+#### `POST /api/auth/google` (odpowiedź)
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 5,
+    "displayName": "Jan Kowalski",
+    "avatarUrl": "https://lh3.googleusercontent.com/...",
+    "role": "Creator",
+    "googleId": "1234567890",
+    "facebookId": null
+  }
+}
+```
+
+---
+
+### 7.7 Autoryzacja — szczegóły
+
+Token JWT generowany jest z następującym payloadem:
+
+```json
+{
+  "nameid": "5",
+  "unique_name": "Jan Kowalski",
+  "role": "creator",
+  "exp": 1753000000
+}
+```
+
+- Ważność tokenu: **30 dni**
+- Algorytm podpisu: **HMAC-SHA256**
+- Klucz konfigurowany przez `appsettings.Development.json` → `Jwt:Key`
+- Token przekazywany w nagłówku: `Authorization: Bearer <token>`
+
+---
+
+### 7.8 Podsumowanie — zestawienie wszystkich endpointów
+
+| Metoda | Endpoint | 🟢 Pub | 🔒 Twórca | 🔴 Admin |
+|--------|----------|:------:|:---------:|:--------:|
+| POST | `/api/auth/google` | ✓ | | |
+| POST | `/api/auth/facebook` | ✓ | | |
+| GET | `/api/auth/me` | | ✓ | |
+| GET | `/api/photos` | ✓ | | |
+| GET | `/api/photos/{id}` | ✓ | | |
+| GET | `/api/photos/my` | | ✓ | |
+| POST | `/api/photos` | | ✓ | |
+| PUT | `/api/photos/{id}` | | ✓ (własne) | ✓ (wszystkie) |
+| DELETE | `/api/photos/{id}` | | ✓ (własne) | ✓ (wszystkie) |
+| GET | `/api/categories` | ✓ | | |
+| GET | `/api/categories/{id}` | ✓ | | |
+| POST | `/api/categories` | | | ✓ |
+| PUT | `/api/categories/{id}` | | | ✓ |
+| DELETE | `/api/categories/{id}` | | | ✓ |
+| GET | `/api/photos/{photoId}/comments` | ✓ | | |
+| POST | `/api/photos/{photoId}/comments` | | ✓ | |
+| PUT | `/api/comments/{id}` | | ✓ (własne) | ✓ (wszystkie) |
+| DELETE | `/api/comments/{id}` | | ✓ (własne) | ✓ (wszystkie) |
+| GET | `/api/admin/users` | | | ✓ |
+| PUT | `/api/admin/users/{id}/block` | | | ✓ |
+| PUT | `/api/admin/users/{id}/unblock` | | | ✓ |
+| GET | `/api/admin/stats` | | | ✓ |
+
+**Łącznie: 22 endpointy — 7 publicznych, 6 wyłącznie twórcy, 9 wyłącznie admina.**
+
+---
+
+## 8. Analiza dostępności informacji (WCAG 2.1 AA)
 
 ### 7.1 Przegląd wymagania
 
