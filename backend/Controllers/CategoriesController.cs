@@ -1,6 +1,7 @@
 using Backend.Models;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
@@ -23,6 +24,7 @@ public class CategoriesController: ControllerBase
         return Ok(categories);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> AddCategory([FromBody] Category category)
     {
@@ -39,6 +41,7 @@ public class CategoriesController: ControllerBase
         return Ok(category);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
@@ -49,6 +52,7 @@ public class CategoriesController: ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> PutCategory(int id, [FromBody] Category category)
     {

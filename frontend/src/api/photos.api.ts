@@ -73,6 +73,7 @@ export const photosApi = {
     if (params.categoryId) searchParams.categoryId = String(params.categoryId)
     if (params.dateFrom) searchParams.dateFrom = params.dateFrom
     if (params.dateTo) searchParams.dateTo = params.dateTo
+    if (params.tag) searchParams.tag = params.tag
     if (params.sortBy) searchParams.sortBy = params.sortBy
     if (params.sortDir) searchParams.sortDir = params.sortDir
     if (params.page) searchParams.page = String(params.page)

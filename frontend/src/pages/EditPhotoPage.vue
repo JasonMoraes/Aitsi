@@ -32,6 +32,13 @@ const form = reactive({
   lat: undefined as number | undefined,
   lng: undefined as number | undefined,
   locationLabel: '',
+  technique: '',
+  quote: '',
+  inventoryNumber: '',
+  originalFormat: '',
+  license: '',
+  digitization: '',
+  tags: '',
 })
 
 onMounted(async () => {
@@ -46,6 +53,13 @@ onMounted(async () => {
     form.lat = photo.location?.lat
     form.lng = photo.location?.lng
     form.locationLabel = photo.locationLabel ?? ''
+    form.technique = photo.technique ?? ''
+    form.quote = photo.quote ?? ''
+    form.inventoryNumber = photo.inventoryNumber ?? ''
+    form.originalFormat = photo.originalFormat ?? ''
+    form.license = photo.license ?? ''
+    form.digitization = photo.digitization ?? ''
+    form.tags = photo.tags?.join(', ') ?? ''
     existingImageUrl.value = photo.imageUrl
   } catch {
     toastStore.show(t('common.error'), 'error')
@@ -67,6 +81,13 @@ async function handleSubmit() {
       lat: form.lat,
       lng: form.lng,
       locationLabel: form.locationLabel,
+      technique: form.technique || undefined,
+      quote: form.quote || undefined,
+      inventoryNumber: form.inventoryNumber || undefined,
+      originalFormat: form.originalFormat || undefined,
+      license: form.license || undefined,
+      digitization: form.digitization || undefined,
+      tags: form.tags || undefined,
     })
     toastStore.show('Zdjecie zostalo zaktualizowane!', 'success')
     router.push({ name: 'my-photos' })
@@ -161,6 +182,54 @@ async function handleSubmit() {
           />
         </div>
       </div>
+
+      <div class="form-field">
+        <label for="ep-quote">Cytat / historia</label>
+        <textarea
+          id="ep-quote"
+          v-model="form.quote"
+          rows="2"
+          maxlength="1000"
+          placeholder="Anegdota, wspomnienie lub cytat zwiazany ze zdjeciem..."
+        ></textarea>
+      </div>
+
+      <div class="form-field">
+        <label for="ep-tags">Tagi</label>
+        <input
+          id="ep-tags"
+          v-model="form.tags"
+          type="text"
+          placeholder="np. Architektura, Transport, Dwudziestolecie"
+        />
+        <span style="font-size: var(--label-sm, 0.75rem); color: var(--on-surface-variant); margin-top: 4px;">Oddziel tagi przecinkami</span>
+      </div>
+
+      <details class="form-details">
+        <summary class="form-details-summary">Metadane techniczne</summary>
+        <div class="form-details-grid">
+          <div class="form-field">
+            <label for="ep-technique">Technika</label>
+            <input id="ep-technique" v-model="form.technique" type="text" placeholder="np. Sepia, Srebro" />
+          </div>
+          <div class="form-field">
+            <label for="ep-format">Format oryginalu</label>
+            <input id="ep-format" v-model="form.originalFormat" type="text" placeholder="np. 13 x 18 cm" />
+          </div>
+          <div class="form-field">
+            <label for="ep-inventory">Nr inwentarzowy</label>
+            <input id="ep-inventory" v-model="form.inventoryNumber" type="text" placeholder="np. HA/2023/X-102" />
+          </div>
+          <div class="form-field">
+            <label for="ep-license">Licencja</label>
+            <input id="ep-license" v-model="form.license" type="text" placeholder="np. CC BY-NC 4.0" />
+          </div>
+          <div class="form-field">
+            <label for="ep-digitization">Digitalizacja</label>
+            <input id="ep-digitization" v-model="form.digitization" type="text" placeholder="np. 600 DPI, TIFF" />
+          </div>
+        </div>
+      </details>
 
       <button type="submit" class="submit-btn" :disabled="submitting">
         {{ submitting ? t('common.loading') : t('common.save') }}
@@ -326,6 +395,40 @@ async function handleSubmit() {
 
 @media (max-width: 480px) {
   .location-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-details {
+  border: 1px solid var(--outline-variant, #ccc);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.form-details-summary {
+  padding: 12px 16px;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: var(--body-sm);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  background: var(--surface-container-low);
+  transition: background var(--transition-fast);
+}
+
+.form-details-summary:hover {
+  background: var(--surface-container-high);
+}
+
+.form-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+@media (max-width: 480px) {
+  .form-details-grid {
     grid-template-columns: 1fr;
   }
 }

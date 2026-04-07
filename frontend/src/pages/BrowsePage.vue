@@ -27,6 +27,7 @@ const filters = ref({
   categoryId: undefined as number | undefined,
   dateFrom: '',
   dateTo: '',
+  tag: '',
   sortBy: 'relevance' as 'date' | 'createdAt' | 'relevance',
   sortDir: 'desc' as 'asc' | 'desc',
 })
@@ -38,6 +39,7 @@ const activeFilterCount = computed(() => {
   if (filters.value.categoryId) count++
   if (filters.value.dateFrom) count++
   if (filters.value.dateTo) count++
+  if (filters.value.tag) count++
   if (filters.value.sortBy !== 'relevance') count++
   return count
 })
@@ -50,7 +52,7 @@ function handleSearch(query: string) {
 }
 
 function resetFilters() {
-  filters.value = { categoryId: undefined, dateFrom: '', dateTo: '', sortBy: 'relevance', sortDir: 'desc' }
+  filters.value = { categoryId: undefined, dateFrom: '', dateTo: '', tag: '', sortBy: 'relevance', sortDir: 'desc' }
   currentPage.value = 1
   photosStore.fetchPhotos({ q: searchQuery.value, ...filters.value, page: 1 })
 }
@@ -72,6 +74,7 @@ onMounted(() => {
   if (route.query.sortDir) filters.value.sortDir = String(route.query.sortDir) as any
   if (route.query.dateFrom) filters.value.dateFrom = String(route.query.dateFrom)
   if (route.query.dateTo) filters.value.dateTo = String(route.query.dateTo)
+  if (route.query.tag) filters.value.tag = String(route.query.tag)
   if (props.categoryId) filters.value.categoryId = Number(props.categoryId)
   else if (route.query.categoryId) filters.value.categoryId = Number(route.query.categoryId)
   if (route.query.page) currentPage.value = Number(route.query.page)
@@ -104,6 +107,7 @@ watch(filtersOpen, (open) => {
         v-model:categoryId="filters.categoryId"
         v-model:dateFrom="filters.dateFrom"
         v-model:dateTo="filters.dateTo"
+        v-model:tag="filters.tag"
         v-model:sortBy="filters.sortBy"
         v-model:sortDir="filters.sortDir"
         :categories="categoriesStore.tree"
